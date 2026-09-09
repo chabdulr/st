@@ -1,0 +1,3233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Test Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --black: #0B0B0B;
+            --white: #FFFFFF;
+            --forest-green: #14532D;
+            --deep-forest: #0B3D2E;
+            --soft-bg: #F5F7F5;
+            --border: #DDE5DF;
+            --text-primary: #0B0B0B;
+            --text-secondary: #4A5D52;
+            --text-muted: #7A8A80;
+            --shadow-sm: 0 1px 3px rgba(11, 61, 46, 0.08);
+            --shadow-md: 0 4px 12px rgba(11, 61, 46, 0.12);
+            --shadow-lg: 0 8px 24px rgba(11, 61, 46, 0.18);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--soft-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mt-4 { margin-top: 2rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 2rem; }
+        .flex { display: flex; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .flex-center { display: flex; justify-content: center; align-items: center; }
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+        .gap-3 { gap: 1.5rem; }
+        .flex-wrap { flex-wrap: wrap; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            text-decoration: none;
+            letter-spacing: 0.01em;
+            line-height: 1.2;
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary {
+            background: var(--forest-green);
+            color: var(--white);
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-primary:hover {
+            background: var(--deep-forest);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background: var(--white);
+            color: var(--forest-green);
+            border-color: var(--forest-green);
+        }
+        .btn-secondary:hover {
+            background: var(--soft-bg);
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: #7F1D1D;
+            color: var(--white);
+        }
+        .btn-danger:hover { background: #5C1414; }
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border-color: var(--border);
+        }
+        .btn-ghost:hover {
+            background: var(--soft-bg);
+            border-color: var(--text-muted);
+        }
+        .btn-sm {
+            padding: 0.4rem 0.9rem;
+            font-size: 0.85rem;
+            min-height: 34px;
+            border-radius: 6px;
+        }
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            min-height: 52px;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .btn-success {
+            background: var(--forest-green);
+            color: var(--white);
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        .card-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+            color: var(--text-primary);
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background: var(--white);
+            color: var(--text-primary);
+            -webkit-appearance: none;
+            appearance: none;
+            min-height: 44px;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--forest-green);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(20, 83, 45, 0.1);
+        }
+        .form-textarea { resize: vertical; min-height: 100px; }
+        .form-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234A5D52' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+        .form-error {
+            color: #7F1D1D;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+        .form-error.visible { display: block; }
+        .form-success {
+            color: var(--forest-green);
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+        .form-success.visible { display: block; }
+
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            min-width: 600px;
+        }
+        .data-table th {
+            background: var(--soft-bg);
+            text-align: left;
+            padding: 0.8rem 1rem;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+        }
+        .data-table td {
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+        .data-table tr:hover td {
+            background: rgba(245, 247, 245, 0.7);
+        }
+        .data-table .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+        .badge-pass { background: #DCFCE7; color: #166534; }
+        .badge-fail { background: #FEE2E2; color: #991B1B; }
+        .badge-pending { background: #FEF9C3; color: #854D0E; }
+        .badge-verified { background: #DCFCE7; color: #166534; }
+        .badge-active { background: #DCFCE7; color: #166534; }
+        .badge-inactive { background: #F3F4F6; color: #6B7280; }
+        .badge-published { background: #DCFCE7; color: #166534; }
+        .badge-draft { background: #FEF9C3; color: #854D0E; }
+
+        .navbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--forest-green);
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .navbar-brand .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--forest-green);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 800;
+            font-size: 0.85rem;
+            letter-spacing: 0;
+        }
+        .navbar-nav {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+        .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            border: none;
+            background: none;
+            font-family: var(--font);
+            letter-spacing: 0.01em;
+        }
+        .nav-link:hover {
+            background: var(--soft-bg);
+            color: var(--forest-green);
+        }
+        .nav-link.active {
+            background: rgba(20, 83, 45, 0.1);
+            color: var(--forest-green);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--forest-green);
+            letter-spacing: -0.03em;
+            margin-top: 0.3rem;
+        }
+        .stat-sub {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.25rem;
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn {
+            padding: 0.7rem 1.2rem;
+            border: none;
+            background: none;
+            font-family: var(--font);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            letter-spacing: 0.01em;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .tab-btn:hover { color: var(--forest-green); }
+        .tab-btn.active {
+            color: var(--forest-green);
+            border-bottom-color: var(--forest-green);
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .test-progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .test-progress-fill {
+            height: 100%;
+            background: var(--forest-green);
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+        .question-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+        }
+        .question-number {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--forest-green);
+        }
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 0.75rem 0 1.5rem;
+            line-height: 1.5;
+        }
+        .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+            font-size: 0.95rem;
+            background: var(--white);
+            color: var(--text-primary);
+            width: 100%;
+            text-align: left;
+            letter-spacing: 0.01em;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .option-btn:hover {
+            border-color: var(--forest-green);
+            background: rgba(20, 83, 45, 0.03);
+        }
+        .option-btn.selected {
+            border-color: var(--forest-green);
+            background: rgba(20, 83, 45, 0.08);
+            box-shadow: 0 0 0 3px rgba(20, 83, 45, 0.1);
+        }
+        .option-letter {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--soft-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        .option-btn.selected .option-letter {
+            background: var(--forest-green);
+            color: var(--white);
+        }
+        .test-nav-btns {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .test-timer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .test-timer.warning {
+            color: #7F1D1D;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .auth-container {
+            max-width: 440px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .auth-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+        .auth-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        .auth-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .setup-container {
+            max-width: 600px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+        }
+
+        .report-preview {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--forest-green);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .report-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--forest-green);
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .report-logo {
+            max-width: 80px;
+            max-height: 80px;
+            object-fit: contain;
+        }
+        .report-org-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--forest-green);
+        }
+        .report-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .report-badge {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.03em;
+        }
+        .report-badge.pass {
+            background: #DCFCE7;
+            color: #166534;
+            border: 2px solid #166534;
+        }
+        .report-badge.fail {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 2px solid #991B1B;
+        }
+
+        @media (max-width: 768px) {
+            .data-table { font-size: 0.8rem; }
+            .data-table th, .data-table td { padding: 0.5rem 0.6rem; }
+            .navbar { padding: 0 0.75rem; }
+            .navbar-brand { font-size: 0.9rem; }
+            .nav-link { padding: 0.4rem 0.6rem; font-size: 0.8rem; }
+            .dashboard-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+            .stat-value { font-size: 1.5rem; }
+            .auth-card { padding: 1.5rem; }
+            .question-card { padding: 1.25rem; }
+            .question-text { font-size: 1rem; }
+            .test-nav-btns { flex-direction: column; }
+            .test-nav-btns .btn { width: 100%; }
+            .report-header { flex-direction: column; text-align: center; gap: 1rem; }
+        }
+        @media (max-width: 480px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .navbar-brand .brand-text { display: none; }
+            .auth-card { padding: 1.25rem; }
+            .btn { padding: 0.6rem 1rem; font-size: 0.85rem; min-height: 38px; }
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .print-area, .print-area * { visibility: visible; }
+            .print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 2rem;
+            }
+            .no-print { display: none !important; }
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--border);
+            border-top-color: var(--forest-green);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--white);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            z-index: 1000;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideUp 0.3s ease;
+            max-width: 400px;
+        }
+        .toast.success { border-left: 4px solid var(--forest-green); }
+        .toast.error { border-left: 4px solid #7F1D1D; }
+        .toast.info { border-left: 4px solid #1D4ED8; }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            animation: fadeIn 0.2s ease;
+        }
+        .modal {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            max-width: 700px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: scaleIn 0.25s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .student-row {
+            cursor: pointer;
+        }
+        .student-row:hover td {
+            background: rgba(20, 83, 45, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <div id="toast-container"></div>
+
+    <script>
+    // =====================================================
+    // CONFIGURATION
+    // =====================================================
+    const SUPABASE_URL = 'https://xukwxujvhkbqprcfmfyb.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1a3d4dWp2aGticXByY2ZtZnliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NjE0MzEsImV4cCI6MjEwNDUzNzQzMX0.3kCMvd-f9mooJZa7tAVNyE2aFJj9ek6vkPoUMaXeshE';
+    // =====================================================
+
+    const appState = {
+        currentView: 'loading',
+        user: null,
+        profile: null,
+        studentRecord: null,
+        isAdmin: false,
+        currentTest: null,
+        currentAttempt: null,
+        currentQuestionIndex: 0,
+        answers: {},
+        testTimerInterval: null,
+        testTimeRemaining: 0,
+        testTimerMax: 0,
+        courses: [],
+        lessons: [],
+        tests: [],
+        enrollments: [],
+        systemSettings: null,
+        selectedCourseId: null,
+        selectedLessonId: null,
+        selectedTestId: null,
+        importPreview: null,
+        filters: {
+            search: '',
+            course: '',
+            lesson: '',
+            result: '',
+            status: ''
+        },
+        sortBy: 'newest'
+    };
+
+    let db = null;
+
+    function initializeSupabase() {
+        try {
+            if (!SUPABASE_URL || SUPABASE_URL.includes('YOUR-PROJECT')) {
+                showSetupScreen();
+                return false;
+            }
+            if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes('YOUR-ANON')) {
+                showSetupScreen();
+                return false;
+            }
+            db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            return true;
+        } catch (error) {
+            console.error('Supabase initialization error:', error);
+            showSetupScreen();
+            return false;
+        }
+    }
+
+    function showView(viewName, params = {}) {
+        appState.currentView = viewName;
+        appState.currentParams = params;
+        render();
+    }
+
+    function render() {
+        const app = document.getElementById('app');
+        const view = appState.currentView;
+        app.innerHTML = '';
+        
+        try {
+            switch (view) {
+                case 'loading': renderLoading(app); break;
+                case 'setup': renderSetupScreen(app); break;
+                case 'login': renderLogin(app); break;
+                case 'signup': renderSignup(app); break;
+                case 'forgot-password': renderForgotPassword(app); break;
+                case 'student-dashboard': renderStudentDashboard(app); break;
+                case 'student-course': renderStudentCourse(app); break;
+                case 'student-lesson': renderStudentLesson(app); break;
+                case 'student-test': renderStudentTest(app); break;
+                case 'student-result': renderStudentResult(app); break;
+                case 'student-reports': renderStudentReports(app); break;
+                case 'student-profile': renderStudentProfile(app); break;
+                case 'admin-dashboard': renderAdminDashboard(app); break;
+                case 'admin-students': renderAdminStudents(app); break;
+                case 'admin-courses': renderAdminCourses(app); break;
+                case 'admin-tests': renderAdminTests(app); break;
+                case 'admin-import': renderAdminImport(app); break;
+                case 'admin-materials': renderAdminMaterials(app); break;
+                case 'admin-settings': renderAdminSettings(app); break;
+                default: renderNotFound(app);
+            }
+        } catch (error) {
+            console.error('Render error:', error);
+            app.innerHTML = `
+                <div style="padding: 4rem 2rem; text-align: center;">
+                    <h2 style="color: #7F1D1D;">Something went wrong</h2>
+                    <p style="color: #4A5D52; margin: 1rem 0;">${error.message}</p>
+                    <button class="btn btn-primary" onclick="showView('${appState.user ? (appState.isAdmin ? 'admin-dashboard' : 'student-dashboard') : 'login'}')">
+                        Go Back
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    async function checkSession() {
+        if (!db) return;
+        try {
+            const { data: { session }, error } = await db.auth.getSession();
+            if (error) throw error;
+            if (session) {
+                appState.user = session.user;
+                await loadProfile();
+            } else {
+                appState.user = null;
+                appState.profile = null;
+                appState.isAdmin = false;
+                showView('login');
+            }
+        } catch (error) {
+            console.error('Session check error:', error);
+            showView('login');
+        }
+    }
+
+    async function loadProfile() {
+        if (!appState.user) return;
+        try {
+            const { data: profile, error } = await db
+                .from('profiles')
+                .select('*')
+                .eq('id', appState.user.id)
+                .single();
+            
+            if (error) throw error;
+            appState.profile = profile;
+            appState.isAdmin = profile.role === 'admin';
+            
+            if (appState.isAdmin) {
+                await loadSystemSettings();
+                showView('admin-dashboard');
+            } else {
+                await loadStudentRecord();
+                showView('student-dashboard');
+            }
+        } catch (error) {
+            console.error('Profile load error:', error);
+            showToast('Unable to load profile', 'error');
+        }
+    }
+
+    async function loadStudentRecord() {
+        if (!appState.user) return;
+        try {
+            const { data: student, error } = await db
+                .from('students')
+                .select('*')
+                .eq('auth_user_id', appState.user.id)
+                .single();
+            if (error) throw error;
+            appState.studentRecord = student;
+        } catch (error) {
+            console.error('Student record load error:', error);
+        }
+    }
+
+    async function loadSystemSettings() {
+        try {
+            const { data, error } = await db
+                .from('system_settings')
+                .select('*')
+                .order('id', { ascending: true })
+                .limit(1)
+                .single();
+            if (error && error.code !== 'PGRST116') throw error;
+            appState.systemSettings = data || {
+                organization_name: 'My Organization',
+                report_title: 'Student Assessment Report',
+                system_title: 'Test Management System',
+                default_passing_percentage: 50,
+                default_attempt_policy: 'one_attempt',
+                self_registration_enabled: true
+            };
+        } catch (error) {
+            console.error('Settings load error:', error);
+            appState.systemSettings = {
+                organization_name: 'My Organization',
+                report_title: 'Student Assessment Report',
+                system_title: 'Test Management System',
+                default_passing_percentage: 50,
+                default_attempt_policy: 'one_attempt',
+                self_registration_enabled: true
+            };
+        }
+    }
+
+    async function handleLogin(email, password) {
+        try {
+            const { data, error } = await db.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            if (error) throw error;
+            appState.user = data.user;
+            await db.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', data.user.id);
+            await loadProfile();
+            showToast('Welcome back!', 'success');
+        } catch (error) {
+            console.error('Login error:', error);
+            showToast(error.message || 'Invalid login', 'error');
+            throw error;
+        }
+    }
+
+    async function handleSignup(fullName, email, password) {
+        try {
+            const { data, error } = await db.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: { full_name: fullName }
+                }
+            });
+            if (error) throw error;
+            showToast('Account created! Please check your email to verify.', 'success');
+            showView('login');
+        } catch (error) {
+            console.error('Signup error:', error);
+            showToast(error.message || 'Signup failed', 'error');
+            throw error;
+        }
+    }
+
+    async function handleLogout() {
+        try {
+            await db.auth.signOut();
+            appState.user = null;
+            appState.profile = null;
+            appState.isAdmin = false;
+            appState.studentRecord = null;
+            showView('login');
+            showToast('Logged out', 'info');
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    }
+
+    async function handleForgotPassword(email) {
+        try {
+            const { error } = await db.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + window.location.pathname
+            });
+            if (error) throw error;
+            showToast('Password reset email sent. Check your inbox.', 'success');
+            showView('login');
+        } catch (error) {
+            console.error('Password reset error:', error);
+            showToast(error.message || 'Failed to send reset email', 'error');
+        }
+    }
+
+    async function handleChangePassword(newPassword) {
+        try {
+            const { error } = await db.auth.updateUser({ password: newPassword });
+            if (error) throw error;
+            showToast('Password changed successfully', 'success');
+        } catch (error) {
+            console.error('Password change error:', error);
+            showToast(error.message || 'Failed to change password', 'error');
+        }
+    }
+
+    function renderLoading(app) {
+        app.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;">
+                <div style="text-align:center;">
+                    <div class="spinner" style="width:40px;height:40px;border-width:4px;"></div>
+                    <p style="margin-top:1rem;color:#4A5D52;font-weight:600;">Loading...</p>
+                </div>
+            </div>
+        `;
+    }
+
+    function showSetupScreen() {
+        const app = document.getElementById('app');
+        app.innerHTML = `
+            <div class="setup-container">
+                <div class="card" style="padding:2.5rem;">
+                    <h2 style="font-weight:800;letter-spacing:-0.02em;margin-bottom:1rem;">Backend Configuration Required</h2>
+                    <p style="color:#4A5D52;margin-bottom:1rem;">Please configure your Supabase backend connection to use this application.</p>
+                    <div style="background:#F5F7F5;border-radius:8px;padding:1rem;margin-bottom:1.5rem;">
+                        <p style="font-weight:600;font-size:0.85rem;margin-bottom:0.5rem;">Instructions:</p>
+                        <ol style="font-size:0.85rem;color:#4A5D52;padding-left:1.25rem;">
+                            <li>Create a Supabase project at <a href="https://supabase.com" target="_blank" style="color:#14532D;">supabase.com</a></li>
+                            <li>Run the SQL setup script provided in the documentation</li>
+                            <li>Find your project URL and anon key in Project Settings > API</li>
+                            <li>Open this HTML file and replace <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> at the top of the JavaScript section</li>
+                            <li>Re-deploy to GitHub Pages</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderLogin(app) {
+        app.innerHTML = `
+            <div class="auth-container">
+                <div class="auth-card">
+                    <div style="text-align:center;margin-bottom:1.5rem;">
+                        <div class="navbar-brand" style="justify-content:center;font-size:1.3rem;margin-bottom:0.5rem;">
+                            <span class="logo-icon">TMS</span>
+                        </div>
+                        <h1 class="auth-title">${appState.systemSettings?.system_title || 'Test Management System'}</h1>
+                        <p class="auth-subtitle">${appState.systemSettings?.organization_name || 'Welcome'}</p>
+                    </div>
+                    <form id="login-form" onsubmit="handleLoginForm(event)">
+                        <div class="form-group">
+                            <label class="form-label" for="login-email">Email</label>
+                            <input class="form-input" id="login-email" type="email" required placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="login-password">Password</label>
+                            <input class="form-input" id="login-password" type="password" required placeholder="Your password">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:0.5rem;">Sign In</button>
+                    </form>
+                    <div style="text-align:center;margin-top:1rem;display:flex;flex-direction:column;gap:0.5rem;">
+                        <button class="btn btn-ghost btn-sm" onclick="showView('forgot-password')">Forgot Password?</button>
+                        ${appState.systemSettings?.self_registration_enabled !== false ? 
+                            '<button class="btn btn-ghost btn-sm" onclick="showView(\'signup\')">Create New Account</button>' : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('login-email').focus();
+    }
+
+    function renderSignup(app) {
+        app.innerHTML = `
+            <div class="auth-container">
+                <div class="auth-card">
+                    <h1 class="auth-title text-center">Create Account</h1>
+                    <p class="auth-subtitle text-center">Register as a student</p>
+                    <form onsubmit="handleSignupForm(event)">
+                        <div class="form-group">
+                            <label class="form-label" for="signup-name">Full Name</label>
+                            <input class="form-input" id="signup-name" type="text" required placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="signup-email">Email</label>
+                            <input class="form-input" id="signup-email" type="email" required placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="signup-password">Password</label>
+                            <input class="form-input" id="signup-password" type="password" required minlength="6" placeholder="Minimum 6 characters">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%;">Create Account</button>
+                    </form>
+                    <div style="text-align:center;margin-top:1rem;">
+                        <button class="btn btn-ghost btn-sm" onclick="showView('login')">Back to Login</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderForgotPassword(app) {
+        app.innerHTML = `
+            <div class="auth-container">
+                <div class="auth-card">
+                    <h1 class="auth-title text-center">Reset Password</h1>
+                    <p class="auth-subtitle text-center">Enter your email to receive a reset link</p>
+                    <form onsubmit="handleForgotPasswordForm(event)">
+                        <div class="form-group">
+                            <label class="form-label" for="forgot-email">Email</label>
+                            <input class="form-input" id="forgot-email" type="email" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%;">Send Reset Link</button>
+                    </form>
+                    <div style="text-align:center;margin-top:1rem;">
+                        <button class="btn btn-ghost btn-sm" onclick="showView('login')">Back to Login</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderStudentDashboard(app) {
+        const student = appState.studentRecord;
+        app.innerHTML = `
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="logo-icon">TMS</span>
+                    <span class="brand-text">${appState.systemSettings?.organization_name || 'TMS'}</span>
+                </div>
+                <div class="navbar-nav">
+                    <button class="nav-link active" onclick="loadStudentDashboard()">Dashboard</button>
+                    <button class="nav-link" onclick="showView('student-reports')">My Reports</button>
+                    <button class="nav-link" onclick="showView('student-profile')">Profile</button>
+                    <button class="nav-link" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+            <div style="max-width:1100px;margin:0 auto;padding:1.5rem;">
+                <div class="card mb-2">
+                    <h1 style="font-size:1.5rem;font-weight:800;letter-spacing:-0.02em;">Welcome, ${student?.full_name || 'Student'}</h1>
+                    <p style="color:#4A5D52;">Student ID: ${student?.student_id || 'N/A'}</p>
+                </div>
+                <div class="dashboard-grid" id="student-stats-grid">
+                    <div class="stat-card"><div class="stat-label">Enrolled Courses</div><div class="stat-value" id="stat-courses">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Available Tests</div><div class="stat-value" id="stat-tests">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value" id="stat-completed">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Passed</div><div class="stat-value" id="stat-passed">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Failed</div><div class="stat-value" id="stat-failed">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Avg Score</div><div class="stat-value" id="stat-avg">0%</div></div>
+                </div>
+                <div id="student-courses-list" class="mt-2"></div>
+            </div>
+        `;
+        loadStudentDashboardData();
+    }
+
+    async function loadStudentDashboardData() {
+        const student = appState.studentRecord;
+        if (!student) return;
+        
+        try {
+            const { data: enrollments, error: enrollError } = await db
+                .from('enrollments')
+                .select('*, courses(*)')
+                .eq('student_id', student.id)
+                .eq('status', 'enrolled');
+            if (enrollError) throw enrollError;
+            
+            appState.enrollments = enrollments || [];
+            document.getElementById('stat-courses').textContent = enrollments?.length || 0;
+            
+            const { data: attempts, error: attemptsError } = await db
+                .from('test_attempts')
+                .select('*')
+                .eq('student_id', student.id)
+                .eq('status', 'submitted');
+            if (attemptsError) throw attemptsError;
+            
+            const completedAttempts = attempts || [];
+            const passed = completedAttempts.filter(a => a.result === 'pass').length;
+            const failed = completedAttempts.filter(a => a.result === 'fail').length;
+            const avgScore = completedAttempts.length > 0 ? 
+                Math.round(completedAttempts.reduce((sum, a) => sum + (a.percentage || 0), 0) / completedAttempts.length) : 0;
+            
+            document.getElementById('stat-completed').textContent = completedAttempts.length;
+            document.getElementById('stat-passed').textContent = passed;
+            document.getElementById('stat-failed').textContent = failed;
+            document.getElementById('stat-avg').textContent = avgScore + '%';
+            
+            const { count: testCount } = await db
+                .from('tests')
+                .select('*', { count: 'exact', head: true })
+                .eq('status', 'published');
+            document.getElementById('stat-tests').textContent = testCount || 0;
+            
+            renderStudentCoursesList(enrollments || []);
+        } catch (error) {
+            console.error('Dashboard data error:', error);
+            showToast('Error loading dashboard data', 'error');
+        }
+    }
+
+    function renderStudentCoursesList(enrollments) {
+        const container = document.getElementById('student-courses-list');
+        if (!container) return;
+        
+        if (!enrollments.length) {
+            container.innerHTML = '<div class="card"><p style="color:#7A8A80;">No courses enrolled yet.</p></div>';
+            return;
+        }
+        
+        container.innerHTML = '<h2 style="font-weight:700;margin-bottom:1rem;">My Courses</h2>' +
+            enrollments.map(e => `
+                <div class="card mb-1" style="cursor:pointer;" onclick="openStudentCourse('${e.courses?.id}')">
+                    <div class="flex-between">
+                        <div>
+                            <h3 style="font-weight:700;">${e.courses?.title || 'Course'}</h3>
+                            <p style="color:#4A5D52;font-size:0.9rem;">${e.courses?.description || ''}</p>
+                            <p style="color:#7A8A80;font-size:0.8rem;margin-top:0.3rem;">${e.courses?.course_code || ''}</p>
+                        </div>
+                        <button class="btn btn-secondary btn-sm">View</button>
+                    </div>
+                </div>
+            `).join('');
+    }
+
+    function renderStudentCourse(app) {
+        const courseId = appState.currentParams?.courseId;
+        app.innerHTML = `
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="logo-icon">TMS</span>
+                    <span class="brand-text">${appState.systemSettings?.organization_name || 'TMS'}</span>
+                </div>
+                <div class="navbar-nav">
+                    <button class="nav-link" onclick="showView('student-dashboard')">Dashboard</button>
+                    <button class="nav-link" onclick="showView('student-reports')">My Reports</button>
+                    <button class="nav-link" onclick="showView('student-profile')">Profile</button>
+                    <button class="nav-link" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+            <div style="max-width:900px;margin:0 auto;padding:1.5rem;">
+                <button class="btn btn-ghost btn-sm mb-2" onclick="showView('student-dashboard')">&larr; Back to Dashboard</button>
+                <div id="student-course-content"></div>
+            </div>
+        `;
+        loadStudentCourseLessons(courseId);
+    }
+
+    async function loadStudentCourseLessons(courseId) {
+        const container = document.getElementById('student-course-content');
+        if (!container) return;
+        
+        try {
+            const { data: lessons, error } = await db
+                .from('lessons')
+                .select('*')
+                .eq('course_id', courseId)
+                .eq('status', 'active')
+                .order('lesson_number');
+            if (error) throw error;
+            
+            if (!lessons?.length) {
+                container.innerHTML = '<div class="card"><p>No lessons available.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = lessons.map(l => `
+                <div class="card mb-1" style="cursor:pointer;" onclick="openStudentLesson('${l.id}')">
+                    <div class="flex-between">
+                        <div>
+                            <h3 style="font-weight:700;">Lesson ${l.lesson_number}: ${l.title}</h3>
+                            <p style="color:#4A5D52;font-size:0.9rem;">${l.description || ''}</p>
+                        </div>
+                        <button class="btn btn-secondary btn-sm">Open</button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Lessons load error:', error);
+            container.innerHTML = '<div class="card"><p style="color:#7F1D1D;">Error loading lessons.</p></div>';
+        }
+    }
+
+    function renderStudentLesson(app) {
+        const lessonId = appState.currentParams?.lessonId;
+        app.innerHTML = `
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="logo-icon">TMS</span>
+                    <span class="brand-text">${appState.systemSettings?.organization_name || 'TMS'}</span>
+                </div>
+                <div class="navbar-nav">
+                    <button class="nav-link" onclick="showView('student-dashboard')">Dashboard</button>
+                    <button class="nav-link" onclick="showView('student-reports')">My Reports</button>
+                    <button class="nav-link" onclick="showView('student-profile')">Profile</button>
+                    <button class="nav-link" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+            <div style="max-width:800px;margin:0 auto;padding:1.5rem;">
+                <button class="btn btn-ghost btn-sm mb-2" onclick="showView('student-dashboard')">&larr; Back</button>
+                <div id="student-lesson-content"></div>
+            </div>
+        `;
+        loadStudentLessonData(lessonId);
+    }
+
+    async function loadStudentLessonData(lessonId) {
+        const container = document.getElementById('student-lesson-content');
+        if (!container) return;
+        
+        try {
+            const { data: lesson, error: lessonError } = await db
+                .from('lessons')
+                .select('*, courses(title, course_code)')
+                .eq('id', lessonId)
+                .single();
+            if (lessonError) throw lessonError;
+            
+            const { data: tests, error: testsError } = await db
+                .from('tests')
+                .select('*')
+                .eq('lesson_id', lessonId)
+                .eq('status', 'published');
+            if (testsError) throw testsError;
+            
+            const { data: materials, error: materialsError } = await db
+                .from('lesson_materials')
+                .select('*')
+                .eq('lesson_id', lessonId);
+            if (materialsError) throw materialsError;
+            
+            container.innerHTML = `
+                <div class="card mb-2">
+                    <h2 style="font-weight:800;font-size:1.4rem;">${lesson.title}</h2>
+                    <p style="color:#4A5D52;">${lesson.courses?.title || ''} - ${lesson.courses?.course_code || ''}</p>
+                    <p style="color:#7A8A80;margin-top:0.5rem;">${lesson.description || ''}</p>
+                </div>
+                ${materials?.length ? `
+                <div class="card mb-2">
+                    <h3 style="font-weight:700;">Lesson Materials</h3>
+                    ${materials.map(m => `
+                        <div class="flex-between mt-1" style="padding:0.5rem 0;border-bottom:1px solid var(--border);">
+                            <span>${m.title}</span>
+                            <button class="btn btn-secondary btn-sm" onclick="downloadMaterial('${m.file_path}', '${m.title}')">Download</button>
+                        </div>
+                    `).join('')}
+                </div>` : ''}
+                ${tests?.length ? `
+                <div class="card">
+                    <h3 style="font-weight:700;">Available Tests</h3>
+                    ${tests.map(t => `
+                        <div class="flex-between mt-1" style="padding:0.75rem 0;border-bottom:1px solid var(--border);">
+                            <div>
+                                <p style="font-weight:600;">${t.title}</p>
+                                <p style="font-size:0.85rem;color:#7A8A80;">${t.description || ''} | Passing: ${t.passing_percentage}%</p>
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="startStudentTest('${t.id}')">Start Test</button>
+                        </div>
+                    `).join('')}
+                </div>` : '<div class="card"><p>No tests available for this lesson yet.</p></div>'}
+            `;
+        } catch (error) {
+            console.error('Lesson data error:', error);
+            container.innerHTML = '<div class="card"><p style="color:#7F1D1D;">Error loading lesson data.</p></div>';
+        }
+    }
+
+    async function downloadMaterial(filePath, title) {
+        try {
+            const { data, error } = await db.storage
+                .from('materials')
+                .createSignedUrl(filePath, 3600);
+            if (error) throw error;
+            window.open(data.signedUrl, '_blank');
+        } catch (error) {
+            console.error('Material download error:', error);
+            showToast('Error downloading material', 'error');
+        }
+    }
+
+    function renderStudentTest(app) {
+        const testId = appState.currentParams?.testId;
+        app.innerHTML = `
+            <div class="test-container">
+                <div id="student-test-content"></div>
+            </div>
+        `;
+        initStudentTest(testId);
+    }
+
+    async function initStudentTest(testId) {
+        const container = document.getElementById('student-test-content');
+        if (!container) return;
+        
+        try {
+            const { data: test, error: testError } = await db
+                .from('tests')
+                .select('*')
+                .eq('id', testId)
+                .single();
+            if (testError) throw testError;
+            
+            const { data: existingAttempts, error: attemptError } = await db
+                .from('test_attempts')
+                .select('*')
+                .eq('test_id', testId)
+                .eq('student_id', appState.studentRecord.id)
+                .in('status', ['submitted', 'verified']);
+            if (attemptError) throw attemptError;
+            
+            if (test.attempt_policy === 'one_attempt' && existingAttempts?.length >= 1) {
+                container.innerHTML = `
+                    <div class="card" style="text-align:center;padding:3rem;">
+                        <h2 style="font-weight:800;">Test Already Attempted</h2>
+                        <p style="color:#4A5D52;margin:1rem 0;">You have already completed this test. Only one attempt is allowed.</p>
+                        <button class="btn btn-primary" onclick="showView('student-dashboard')">Back to Dashboard</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (test.max_attempts && existingAttempts?.length >= test.max_attempts) {
+                container.innerHTML = `
+                    <div class="card" style="text-align:center;padding:3rem;">
+                        <h2 style="font-weight:800;">Maximum Attempts Reached</h2>
+                        <p style="color:#4A5D52;margin:1rem 0;">You have reached the maximum number of attempts (${test.max_attempts}) for this test.</p>
+                        <button class="btn btn-primary" onclick="showView('student-dashboard')">Back to Dashboard</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const { data: questions, error: questionsError } = await db
+                .from('questions')
+                .select('id, question_number, question_text, option_a, option_b, option_c, option_d, marks')
+                .eq('test_id', testId)
+                .order('question_number');
+            if (questionsError) throw questionsError;
+            
+            if (!questions?.length) {
+                container.innerHTML = '<div class="card"><p>No questions for this test.</p></div>';
+                return;
+            }
+            
+            appState.currentTest = test;
+            appState.questions = questions;
+            appState.currentQuestionIndex = 0;
+            appState.answers = {};
+            
+            const { data: newAttempt, error: createError } = await db
+                .from('test_attempts')
+                .insert({
+                    test_id: testId,
+                    student_id: appState.studentRecord.id,
+                    attempt_number: (existingAttempts?.length || 0) + 1,
+                    started_at: new Date().toISOString(),
+                    status: 'in_progress'
+                })
+                .select()
+                .single();
+            if (createError) throw createError;
+            
+            appState.currentAttempt = newAttempt;
+            
+            if (test.time_limit_minutes) {
+                appState.testTimerMax = test.time_limit_minutes * 60;
+                appState.testTimeRemaining = appState.testTimerMax;
+                startTestTimer();
+            }
+            
+            renderQuestion();
+        } catch (error) {
+            console.error('Test init error:', error);
+            container.innerHTML = `
+                <div class="card" style="text-align:center;">
+                    <h2 style="font-weight:800;color:#7F1D1D;">Error</h2>
+                    <p style="color:#4A5D52;margin:1rem 0;">${error.message}</p>
+                    <button class="btn btn-primary" onclick="showView('student-dashboard')">Back</button>
+                </div>
+            `;
+        }
+    }
+
+    function renderQuestion() {
+        const container = document.getElementById('student-test-content');
+        if (!container || !appState.questions?.length) return;
+        
+        const qIndex = appState.currentQuestionIndex;
+        const question = appState.questions[qIndex];
+        const totalQuestions = appState.questions.length;
+        const selectedAnswer = appState.answers[question.id] || null;
+        
+        let timerHTML = '';
+        if (appState.testTimerMax > 0) {
+            const mins = Math.floor(appState.testTimeRemaining / 60);
+            const secs = appState.testTimeRemaining % 60;
+            const isWarning = appState.testTimeRemaining < 60;
+            timerHTML = `
+                <div class="test-timer ${isWarning ? 'warning' : ''}">
+                    <span>Time Remaining: ${mins}:${secs.toString().padStart(2, '0')}</span>
+                </div>
+            `;
+        }
+        
+        container.innerHTML = `
+            <div class="flex-between mb-2">
+                <h2 style="font-weight:800;font-size:1.2rem;">${appState.currentTest?.title || 'Test'}</h2>
+                ${timerHTML}
+            </div>
+            <p style="color:#7A8A80;font-weight:600;">Question ${qIndex + 1} of ${totalQuestions}</p>
+            <div class="test-progress-bar">
+                <div class="test-progress-fill" style="width:${((qIndex + 1) / totalQuestions) * 100}%;"></div>
+            </div>
+            <div class="question-card">
+                <p class="question-number">QUESTION ${qIndex + 1}</p>
+                <p class="question-text">${question.question_text}</p>
+                <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                    ${['A', 'B', 'C', 'D'].map(letter => `
+                        <button class="option-btn ${selectedAnswer === letter ? 'selected' : ''}" 
+                                onclick="selectAnswer('${question.id}', '${letter}')">
+                            <span class="option-letter">${letter}</span>
+                            <span>${question['option_' + letter.toLowerCase()]}</span>
+                        </button>
+                    `).join('')}
+                </div>
+                <div class="test-nav-btns">
+                    <button class="btn btn-ghost" onclick="navigateQuestion(-1)" ${qIndex === 0 ? 'disabled' : ''}>
+                        Previous
+                    </button>
+                    ${qIndex === totalQuestions - 1 ? 
+                        `<button class="btn btn-primary" onclick="confirmSubmitTest()">Submit Test</button>` :
+                        `<button class="btn btn-primary" onclick="navigateQuestion(1)">Next</button>`
+                    }
+                </div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:1rem;">
+                ${appState.questions.map((q, i) => `
+                    <button class="btn ${i === qIndex ? 'btn-primary' : (appState.answers[q.id] ? 'btn-secondary' : 'btn-ghost')}" 
+                            style="min-width:36px;padding:0.3rem 0.5rem;font-size:0.75rem;min-height:32px;"
+                            onclick="jumpToQuestion(${i})">
+                        ${i + 1}
+                    </button>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    function selectAnswer(questionId, answer) {
+        appState.answers[questionId] = answer;
+        renderQuestion();
+    }
+
+    function navigateQuestion(delta) {
+        appState.currentQuestionIndex += delta;
+        if (appState.currentQuestionIndex < 0) appState.currentQuestionIndex = 0;
+        if (appState.currentQuestionIndex >= appState.questions.length) 
+            appState.currentQuestionIndex = appState.questions.length - 1;
+        renderQuestion();
+    }
+
+    function jumpToQuestion(index) {
+        appState.currentQuestionIndex = index;
+        renderQuestion();
+    }
+
+    function confirmSubmitTest() {
+        const unanswered = appState.questions.filter(q => !appState.answers[q.id]).length;
+        const confirmMsg = unanswered > 0 ? 
+            `You have ${unanswered} unanswered question(s).\n\nAre you sure you want to submit your test?` :
+            'Are you sure you want to submit your test?';
+        
+        if (confirm(confirmMsg)) {
+            submitTest();
+        }
+    }
+
+    async function submitTest() {
+        try {
+            for (const question of appState.questions) {
+                const selected = appState.answers[question.id] || null;
+                await db.from('attempt_answers').insert({
+                    attempt_id: appState.currentAttempt.id,
+                    question_id: question.id,
+                    selected_answer: selected,
+                    is_correct: null,
+                    marks_awarded: 0
+                });
+            }
+            
+            const answersJson = {};
+            for (const question of appState.questions) {
+                answersJson[question.id] = appState.answers[question.id] || null;
+            }
+            
+            const { data: result, error: gradeError } = await db
+                .rpc('grade_test_attempt', {
+                    p_test_id: appState.currentTest.id,
+                    p_attempt_id: appState.currentAttempt.id,
+                    p_answers: answersJson
+                });
+            
+            if (gradeError) throw gradeError;
+            
+            stopTestTimer();
+            showToast('Test submitted successfully!', 'success');
+            showView('student-result', { attemptId: appState.currentAttempt.id, result: result });
+        } catch (error) {
+            console.error('Submit error:', error);
+            showToast('Error submitting test: ' + error.message, 'error');
+        }
+    }
+
+    function renderStudentResult(app) {
+        const result = appState.currentParams?.result;
+        app.innerHTML = `
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="logo-icon">TMS</span>
+                    <span class="brand-text">${appState.systemSettings?.organization_name || 'TMS'}</span>
+                </div>
+                <div class="navbar-nav">
+                    <button class="nav-link" onclick="showView('student-dashboard')">Dashboard</button>
+                    <button class="nav-link" onclick="showView('student-reports')">My Reports</button>
+                    <button class="nav-link" onclick="showView('student-profile')">Profile</button>
+                    <button class="nav-link" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+            <div style="max-width:600px;margin:0 auto;padding:1.5rem;">
+                <div class="card text-center" style="padding:3rem 2rem;">
+                    <div style="font-size:3rem;margin-bottom:1rem;">${result?.result === 'pass' ? 'PASS' : 'FAIL'}</div>
+                    <h2 style="font-weight:800;">${result?.result === 'pass' ? 'Congratulations!' : 'Keep Working'}</h2>
+                    <div style="margin:2rem 0;">
+                        <p style="font-size:3rem;font-weight:800;color:var(--forest-green);">${result?.percentage || 0}%</p>
+                        <p style="color:#4A5D52;">Score: ${result?.obtained_marks || 0} / ${result?.total_marks || 0}</p>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;text-align:left;">
+                        <div class="card" style="padding:1rem;text-align:center;">
+                            <p style="font-size:1.5rem;font-weight:800;">${result?.correct || 0}</p>
+                            <p style="color:#7A8A80;font-size:0.85rem;">Correct</p>
+                        </div>
+                        <div class="card" style="padding:1rem;text-align:center;">
+                            <p style="font-size:1.5rem;font-weight:800;">${result?.wrong || 0}</p>
+                            <p style="color:#7A8A80;font-size:0.85rem;">Wrong</p>
+                        </div>
+                        <div class="card" style="padding:1rem;text-align:center;">
+                            <p style="font-size:1.5rem;font-weight:800;">${result?.unanswered || 0}</p>
+                            <p style="color:#7A8A80;font-size:0.85rem;">Unanswered</p>
+                        </div>
+                        <div class="card" style="padding:1rem;text-align:center;">
+                            <p style="font-size:1.5rem;font-weight:800;">${result?.attempted || 0}</p>
+                            <p style="color:#7A8A80;font-size:0.85rem;">Attempted</p>
+                        </div>
+                    </div>
+                    <p style="color:#7A8A80;font-size:0.85rem;margin-top:1rem;">Report Number: ${result?.report_number || 'Pending'}</p>
+                    <div style="margin-top:1.5rem;display:flex;gap:1rem;justify-content:center;">
+                        <button class="btn btn-primary" onclick="showView('student-dashboard')">Back to Dashboard</button>
+                        <button class="btn btn-secondary" onclick="showView('student-reports')">View Reports</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderStudentReports(app) {
+        app.innerHTML = `
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="logo-icon">TMS</span>
+                    <span class="brand-text">${appState.systemSettings?.organization_name || 'TMS'}</span>
+                </div>
+                <div class="navbar-nav">
+                    <button class="nav-link" onclick="showView('student-dashboard')">Dashboard</button>
+                    <button class="nav-link active" onclick="showView('student-reports')">My Reports</button>
+                    <button class="nav-link" onclick="showView('student-profile')">Profile</button>
+                    <button class="nav-link" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+            <div style="max-width:900px;margin:0 auto;padding:1.5rem;">
+                <h2 style="font-weight:800;margin-bottom:1rem;">My Reports</h2>
+                <div id="student-reports-list"></div>
+            </div>
+        `;
+        loadStudentReports();
+    }
+
+    async function loadStudentReports() {
+        const container = document.getElementById('student-reports-list');
+        if (!container) return;
+        
+        try {
+            const { data: attempts, error } = await db
+                .from('test_attempts')
+                .select('*, tests(title, lessons(title, courses(title)))')
+                .eq('student_id', appState.studentRecord.id)
+                .in('status', ['submitted', 'verified'])
+                .order('submitted_at', { ascending: false });
+            if (error) throw error;
+            
+            if (!attempts?.length) {
+                container.innerHTML = '<div class="card"><p>No reports available yet.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = attempts.map(a => `
+                <div class="card mb-1">
+                    <div class="flex-between flex-wrap gap-2">
+                        <div>
+                            <p style="font-weight:700;">${a.tests?.title || 'Test'}</p>
+                            <p style="font-size:0.85rem;color:#7A8A80;">
+                                ${a.tests?.lessons?.courses?.title || ''} > ${a.tests?.lessons?.title || ''}
+                            </p>
+                            <p style="font-size:0.8rem;color:#7A8A80;">${new Date(a.submitted_at).toLocaleString()}</p>
+                        </div>
+                        <div style="text-align:right;">
+                            <span class="badge ${a.result === 'pass' ? 'badge-pass' : 'badge-fail'}">${a.result?.toUpperCase() || 'PENDING'}</span>
+                            <p style="font-size:1.2rem;font-weight:800;margin-top:0.3rem;">${a.percentage || 0}%</p>
+                            <button class="btn btn-secondary btn-sm mt-1" onclick="viewStudentReport('${a.id}')">View Report</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Reports load error:', error);
+            container.innerHTML = '<div class="card"><p style="color:#7F1D1D;">Error loading reports.</p></div>';
+        }
+    }
+
+    function viewStudentReport(attemptId) {
+        showView('student-reports');
+        showToast('Report viewing coming soon', 'info');
+    }
+
+    function renderStudentProfile(app) {
+        const student = appState.studentRecord;
+        app.innerHTML = `
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="logo-icon">TMS</span>
+                    <span class="brand-text">${appState.systemSettings?.organization_name || 'TMS'}</span>
+                </div>
+                <div class="navbar-nav">
+                    <button class="nav-link" onclick="showView('student-dashboard')">Dashboard</button>
+                    <button class="nav-link" onclick="showView('student-reports')">My Reports</button>
+                    <button class="nav-link active" onclick="showView('student-profile')">Profile</button>
+                    <button class="nav-link" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+            <div style="max-width:600px;margin:0 auto;padding:1.5rem;">
+                <div class="card">
+                    <h2 style="font-weight:800;margin-bottom:1rem;">My Profile</h2>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                        <div><p style="font-weight:600;color:#7A8A80;">Student ID</p><p>${student?.student_id || 'N/A'}</p></div>
+                        <div><p style="font-weight:600;color:#7A8A80;">Full Name</p><p>${student?.full_name || 'N/A'}</p></div>
+                        <div><p style="font-weight:600;color:#7A8A80;">Email</p><p>${student?.email || 'N/A'}</p></div>
+                        <div><p style="font-weight:600;color:#7A8A80;">Enrollment Date</p><p>${student?.enrollment_date || 'N/A'}</p></div>
+                        <div><p style="font-weight:600;color:#7A8A80;">Status</p><p><span class="badge badge-active">${student?.status || 'active'}</span></p></div>
+                    </div>
+                </div>
+                <div class="card mt-2">
+                    <h3 style="font-weight:700;margin-bottom:1rem;">Account Settings</h3>
+                    <div class="form-group">
+                        <label class="form-label">Change Password</label>
+                        <input type="password" id="profile-new-password" class="form-input" placeholder="New password" minlength="6">
+                    </div>
+                    <button class="btn btn-primary" onclick="changePasswordFromProfile()">Update Password</button>
+                </div>
+            </div>
+        `;
+    }
+
+    async function changePasswordFromProfile() {
+        const password = document.getElementById('profile-new-password')?.value;
+        if (!password || password.length < 6) {
+            showToast('Password must be at least 6 characters', 'error');
+            return;
+        }
+        await handleChangePassword(password);
+        document.getElementById('profile-new-password').value = '';
+    }
+
+    function renderAdminDashboard(app) {
+        app.innerHTML = `
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="logo-icon">TMS</span>
+                    <span class="brand-text">${appState.systemSettings?.organization_name || 'TMS'}</span>
+                </div>
+                <div class="navbar-nav">
+                    <button class="nav-link active" onclick="showView('admin-dashboard')">Dashboard</button>
+                    <button class="nav-link" onclick="showView('admin-students')">Students</button>
+                    <button class="nav-link" onclick="showView('admin-courses')">Courses</button>
+                    <button class="nav-link" onclick="showView('admin-tests')">Tests</button>
+                    <button class="nav-link" onclick="showView('admin-import')">Import</button>
+                    <button class="nav-link" onclick="showView('admin-materials')">Materials</button>
+                    <button class="nav-link" onclick="showView('admin-settings')">Settings</button>
+                    <button class="nav-link" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+            <div style="max-width:1200px;margin:0 auto;padding:1.5rem;">
+                <div class="dashboard-grid" id="admin-stats-grid">
+                    <div class="stat-card"><div class="stat-label">Total Students</div><div class="stat-value" id="admin-stat-students">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Active Students</div><div class="stat-value" id="admin-stat-active">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Total Courses</div><div class="stat-value" id="admin-stat-courses">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Total Lessons</div><div class="stat-value" id="admin-stat-lessons">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Total Tests</div><div class="stat-value" id="admin-stat-tests">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Total Attempts</div><div class="stat-value" id="admin-stat-attempts">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Passed</div><div class="stat-value" id="admin-stat-passed">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Failed</div><div class="stat-value" id="admin-stat-failed">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Avg Score</div><div class="stat-value" id="admin-stat-avg">0%</div></div>
+                </div>
+                <div id="admin-lesson-tabs" class="mt-2"></div>
+            </div>
+        `;
+        loadAdminDashboardData();
+    }
+
+    async function loadAdminDashboardData() {
+        try {
+            const { count: studentCount } = await db.from('students').select('*', { count: 'exact', head: true });
+            const { count: activeStudentCount } = await db.from('students').select('*', { count: 'exact', head: true }).eq('status', 'active');
+            const { count: courseCount } = await db.from('courses').select('*', { count: 'exact', head: true }).eq('status', 'active');
+            const { count: lessonCount } = await db.from('lessons').select('*', { count: 'exact', head: true }).eq('status', 'active');
+            const { count: testCount } = await db.from('tests').select('*', { count: 'exact', head: true });
+            const { count: attemptCount } = await db.from('test_attempts').select('*', { count: 'exact', head: true }).in('status', ['submitted', 'verified']);
+            const { count: passedCount } = await db.from('test_attempts').select('*', { count: 'exact', head: true }).eq('result', 'pass');
+            const { count: failedCount } = await db.from('test_attempts').select('*', { count: 'exact', head: true }).eq('result', 'fail');
+            
+            const { data: attempts } = await db.from('test_attempts').select('percentage').in('status', ['submitted', 'verified']);
+            const avgScore = attempts?.length ? Math.round(attempts.reduce((s, a) => s + (a.percentage || 0), 0) / attempts.length) : 0;
+            
+            document.getElementById('admin-stat-students').textContent = studentCount || 0;
+            document.getElementById('admin-stat-active').textContent = activeStudentCount || 0;
+            document.getElementById('admin-stat-courses').textContent = courseCount || 0;
+            document.getElementById('admin-stat-lessons').textContent = lessonCount || 0;
+            document.getElementById('admin-stat-tests').textContent = testCount || 0;
+            document.getElementById('admin-stat-attempts').textContent = attemptCount || 0;
+            document.getElementById('admin-stat-passed').textContent = passedCount || 0;
+            document.getElementById('admin-stat-failed').textContent = failedCount || 0;
+            document.getElementById('admin-stat-avg').textContent = avgScore + '%';
+            
+            await loadAdminLessonTabs();
+        } catch (error) {
+            console.error('Admin dashboard error:', error);
+            showToast('Error loading dashboard', 'error');
+        }
+    }
+
+    async function loadAdminLessonTabs() {
+        const container = document.getElementById('admin-lesson-tabs');
+        if (!container) return;
+        
+        try {
+            const { data: lessons, error } = await db
+                .from('lessons')
+                .select('*, courses(title)')
+                .eq('status', 'active')
+                .order('lesson_number');
+            if (error) throw error;
+            
+            if (!lessons?.length) {
+                container.innerHTML = '<div class="card"><p>No lessons created yet. Create courses and lessons to get started.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="card">
+                    <h3 style="font-weight:700;margin-bottom:1rem;">Lesson Performance</h3>
+                    <div class="tabs">
+                        ${lessons.map((l, i) => `
+                            <button class="tab-btn ${i === 0 ? 'active' : ''}" onclick="loadLessonPerformance('${l.id}', this)">
+                                ${l.title}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="lesson-performance-content" style="margin-top:1rem;"></div>
+                </div>
+            `;
+            
+            if (lessons.length > 0) {
+                loadLessonPerformance(lessons[0].id);
+            }
+        } catch (error) {
+            console.error('Lesson tabs error:', error);
+            container.innerHTML = '<div class="card"><p>Error loading lessons.</p></div>';
+        }
+    }
+
+    async function loadLessonPerformance(lessonId, tabBtn = null) {
+        if (tabBtn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            tabBtn.classList.add('active');
+        }
+        
+        const container = document.getElementById('lesson-performance-content');
+        if (!container) return;
+        
+        try {
+            const { data: students, error } = await db
+                .from('students')
+                .select('*')
+                .eq('status', 'active');
+            if (error) throw error;
+            
+            const { data: attempts, error: attemptError } = await db
+                .from('test_attempts')
+                .select('*, tests(*), students(*)')
+                .in('status', ['submitted', 'verified']);
+            if (attemptError) throw attemptError;
+            
+            const lessonAttempts = (attempts || []).filter(a => a.tests?.lesson_id === lessonId);
+            
+            container.innerHTML = `
+                <p style="color:#7A8A80;margin-bottom:1rem;">Students: ${students?.length || 0} | Attempts: ${lessonAttempts.length}</p>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Test</th>
+                                <th>Date</th>
+                                <th>Score</th>
+                                <th>%</th>
+                                <th>Result</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${lessonAttempts.length ? lessonAttempts.map(a => `
+                                <tr>
+                                    <td>${a.students?.student_id || 'N/A'}</td>
+                                    <td>${a.students?.full_name || 'N/A'}</td>
+                                    <td>${a.tests?.title || 'N/A'}</td>
+                                    <td>${a.submitted_at ? new Date(a.submitted_at).toLocaleDateString() : 'N/A'}</td>
+                                    <td>${a.obtained_marks || 0}/${a.total_marks || 0}</td>
+                                    <td>${a.percentage || 0}%</td>
+                                    <td><span class="badge ${a.result === 'pass' ? 'badge-pass' : 'badge-fail'}">${a.result?.toUpperCase() || 'PENDING'}</span></td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="viewStudentAttemptDetail('${a.id}')">View</button></td>
+                                </tr>
+                            `).join('') : '<tr><td colspan="8" class="text-center">No attempts for this lesson yet</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        } catch (error) {
+            console.error('Lesson performance error:', error);
+            container.innerHTML = '<p style="color:#7F1D1D;">Error loading performance data.</p>';
+        }
+    }
+
+    function renderAdminStudents(app) {
+        app.innerHTML = `
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="logo-icon">TMS</span>
+                    <span class="brand-text">${appState.systemSettings?.organization_name || 'TMS'}</span>
+                </div>
+                <div class="navbar-nav">
+                    <button class="nav-link" onclick="showView('admin-dashboard')">Dashboard</button>
+                    <button class="nav-link active" onclick="showView('admin-students')">Students</button>
+                    <button class="nav-link" onclick="showView('admin-courses')">Courses</button>
+                    <button class="nav-link" onclick="showView('admin-tests')">Tests</button>
+                    <button class="nav-link" onclick="showView('admin-import')">Import</button>
+                    <button class="nav-link" onclick="showView('admin-materials')">Materials</button>
+                    <button class="nav-link" onclick="showView('admin-settings')">Settings</button>
+                    <button class="nav-link" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+            <div style="max-width:1200px;margin:0 auto;padding:1.5rem;">
+                <div class="flex-between flex-wrap gap-2 mb-2">
+                    <h2 style="font-weight:800;">Students</h2>
+                    <button class="btn btn-primary" onclick="showAddStudentModal()">Add Student</button>
+                </div>
+                <div class="card mb-2">
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.75rem;">
+                        <input id="student-search-input" class="form-input" placeholder="Search name, email, ID..." oninput="filterStudents()">
+                        <select id="student-filter-status" class="form-select" onchange="filterStudents()">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                        <select id="student-sort" class="form-select" onchange="filterStudents()">
+                            <option value="newest">Newest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="name">Name A-Z</option>
+                            <option value="id">Student ID</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="admin-students-list"></div>
+            </div>
+        `;
+        loadAdminStudents();
+    }
+
+    async function loadAdminStudents() {
+        const container = document.getElementById('admin-students-list');
+        if (!container) return;
+        
+        try {
+            const searchTerm = document.getElementById('student-search-input')?.value?.toLowerCase() || '';
+            const filterStatus = document.getElementById('student-filter-status')?.value || '';
+            const sortBy = document.getElementById('student-sort')?.value || 'newest';
+            
+            let query = db.from('students').select('*');
+            if (filterStatus) query = query.eq('status', filterStatus);
+            query = query.order('created_at', { ascending: sortBy === 'oldest' });
+            
+            const { data: students, error } = await query;
+            if (error) throw error;
+            
+            let filtered = students || [];
+            if (searchTerm) {
+                filtered = filtered.filter(s => 
+                    s.full_name?.toLowerCase().includes(searchTerm) ||
+                    s.email?.toLowerCase().includes(searchTerm) ||
+                    s.username?.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            if (sortBy === 'name') filtered.sort((a, b) => a.full_name.localeCompare(b.full_name));
+            if (sortBy === 'id') filtered.sort((a, b) => a.username.localeCompare(b.username));
+            
+            container.innerHTML = `
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Username</th>
+                                <th>Class</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filtered.map(s => `
+                                <tr class="student-row" onclick="viewStudentDetail('${s.id}')">
+                                    <td><strong>${s.full_name || 'N/A'}</strong></td>
+                                    <td>${s.email || 'N/A'}</td>
+                                    <td>${s.username || 'N/A'}</td>
+                                    <td>${s.class || 'N/A'}</td>
+                                    <td><span class="badge ${s.status === 'active' ? 'badge-active' : 'badge-inactive'}">${s.status || 'active'}</span></td>
+                                    <td>${s.created_at ? new Date(s.created_at).toLocaleDateString() : 'N/A'}</td>
+                                    <td>
+                                        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();viewStudentDetail('${s.id}')">View</button>
+                                        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editStudentStatus('${s.id}', '${s.status}')">Toggle</button>
+                                    </td>
+                                </tr>
+                            `).join('') || '<tr><td colspan="7" class="text-center">No students found</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        } catch (error) {
+            console.error('Students load error:', error);
+            container.innerHTML = '<div class="card"><p style="color:#7F1D1D;">Error loading students: ' + error.message + '</p></div>';
+        }
+    }
+
+    function filterStudents() { loadAdminStudents(); }
+
+    // ============================================
+    // STUDENT DETAILS VIEWER - FIXED
+    // ============================================
+
+    window.viewStudentDetail = async function(studentId) {
+        if (!studentId || studentId === 'undefined') {
+            showToast('Invalid student ID', 'error');
+            return;
+        }
+        
+        try {
+            // Get student data
+            const { data: student, error } = await db
+                .from('students')
+                .select('*')
+                .eq('id', studentId)
+                .single();
+            
+            if (error) {
+                console.error('Student not found:', error);
+                showToast('Student not found', 'error');
+                return;
+            }
+            
+            // Show in a modal
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal" style="max-width:700px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                        <h2 style="font-weight:800;">${student.full_name || 'Student'}</h2>
+                        <button onclick="this.closest('.modal-overlay').remove()" 
+                                style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button>
+                    </div>
+                    
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+                        <div><p style="font-weight:600;color:#7A8A80;font-size:0.8rem;">Email</p><p>${student.email || 'N/A'}</p></div>
+                        <div><p style="font-weight:600;color:#7A8A80;font-size:0.8rem;">Username</p><p>${student.username || 'N/A'}</p></div>
+                        <div><p style="font-weight:600;color:#7A8A80;font-size:0.8rem;">Class</p><p>${student.class || 'N/A'}</p></div>
+                        <div><p style="font-weight:600;color:#7A8A80;font-size:0.8rem;">Status</p><p><span class="badge ${student.status === 'active' ? 'badge-active' : 'badge-inactive'}">${student.status || 'active'}</span></p></div>
+                        <div><p style="font-weight:600;color:#7A8A80;font-size:0.8rem;">Joined</p><p>${student.created_at ? new Date(student.created_at).toLocaleDateString() : 'N/A'}</p></div>
+                    </div>
+                    
+                    <hr style="margin:1rem 0;">
+                    
+                    <h3 style="font-weight:700;margin-bottom:1rem;">📝 Test History</h3>
+                    <div id="student-test-history">
+                        <div class="spinner"></div>
+                    </div>
+                    
+                    <div style="margin-top:1rem;display:flex;gap:0.5rem;justify-content:flex-end;">
+                        <button class="btn btn-ghost btn-sm" onclick="editStudentStatus('${student.id}', '${student.status}')">
+                            Toggle Status
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="this.closest('.modal-overlay').remove()">Close</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Load test history for this student
+            try {
+                const { data: attempts, error: attemptError } = await db
+                    .from('attempts')
+                    .select('*')
+                    .eq('student_id', studentId)
+                    .order('created_at', { ascending: false });
+                
+                const historyDiv = document.getElementById('student-test-history');
+                
+                if (attemptError || !attempts || attempts.length === 0) {
+                    historyDiv.innerHTML = '<p style="color:#7A8A80;">No test history available.</p>';
+                    return;
+                }
+                
+                let html = '<div style="max-height:300px;overflow-y:auto;">';
+                attempts.forEach(a => {
+                    const resultColor = a.result === 'passed' ? '#166534' : 
+                                       a.result === 'failed' ? '#991B1B' : '#854D0E';
+                    html += `
+                        <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #eee;">
+                            <div>
+                                <p style="font-weight:600;">Test ${a.test_id || 'N/A'}</p>
+                                <p style="font-size:0.8rem;color:#7A8A80;">${a.created_at ? new Date(a.created_at).toLocaleDateString() : 'N/A'}</p>
+                            </div>
+                            <div style="text-align:right;">
+                                <p style="font-weight:700;">${a.score || 0}/${a.total_marks || 0}</p>
+                                <span style="color:${resultColor};font-weight:600;font-size:0.8rem;">${a.result || 'pending'}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                historyDiv.innerHTML = html;
+            } catch (err) {
+                document.getElementById('student-test-history').innerHTML = 
+                    '<p style="color:#7A8A80;">Could not load test history.</p>';
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Error loading student details', 'error');
+        }
+    };
+
+    // Edit student status
+    window.editStudentStatus = async function(studentId, currentStatus) {
+        const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+        try {
+            const { error } = await db
+                .from('students')
+                .update({ status: newStatus })
+                .eq('id', studentId);
+            
+            if (error) throw error;
+            showToast('Student status updated to ' + newStatus, 'success');
+            loadAdminStudents();
+            // Close modal if open
+            document.querySelector('.modal-overlay')?.remove();
+        } catch (error) {
+            showToast('Error updating status: ' + error.message, 'error');
+        }
+    };
+
+    // ============================================
+    // END STUDENT DETAILS FIX
+    // ============================================
+
+    function showAddStudentModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal">
+                <h2 style="font-weight:800;margin-bottom:1rem;">Add Student</h2>
+                <p style="color:#7A8A80;font-size:0.85rem;margin-bottom:1rem;">
+                    Creating a student will send an invitation email.
+                </p>
+                <form onsubmit="handleAddStudent(event)">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="new-student-name" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="new-student-email" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Course (Optional)</label>
+                        <input type="text" id="new-student-course" class="form-input">
+                    </div>
+                    <div style="display:flex;gap:1rem;justify-content:flex-end;">
+                        <button type="button" class="btn btn-ghost" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Student</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    async function handleAddStudent(event) {
+        event.preventDefault();
+        const name = document.getElementById('new-student-name').value;
+        const email = document.getElementById('new-student-email').value;
+        
+        try {
+            // Check if student already exists
+            const { data: existing } = await db
+                .from('students')
+                .select('id')
+                .eq('email', email)
+                .single();
+            
+            if (existing) {
+                showToast('Student already exists!', 'error');
+                return;
+            }
+            
+            // Generate a UUID for the student
+            const studentId = crypto.randomUUID ? crypto.randomUUID() : 
+                'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            
+            const username = email.split('@')[0];
+            
+            // Insert directly into students table (no Auth required)
+            const { error } = await db.from('students').insert({
+                id: studentId,
+                email: email,
+                username: username,
+                full_name: name,
+                class: document.getElementById('new-student-course').value || 'General',
+                status: 'active'
+            });
+            
+            if (error) throw error;
+            
+            showToast('Student added successfully!', 'success');
+            document.querySelector('.modal-overlay')?.remove();
+            loadAdminStudents();
+        } catch (error) {
+            console.error('Add student error:', error);
+            showToast('Error adding student: ' + error.message, 'error');
+        }
+    }
+
+    function renderAdminCourses(app) {
+        app.innerHTML = `
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="logo-icon">TMS</span>
+                    <span class="brand-text">${appState.systemSettings?.organization_name || 'TMS'}</span>
+                </div>
+                <div class="navbar-nav">
+                    <button class="nav-link" onclick="showView('admin-dashboard')">Dashboard</button>
+                    <button class="nav-link" onclick="showView('admin-students')">Students</button>
+                    <button class="nav-link active" onclick="showView('admin-courses')">Courses</button>
+                    <button class="nav-link" onclick="showView('admin-tests')">Tests</button>
+                    <button class="nav-link" onclick="showView('admin-import')">Import</button>
+                    <button class="nav-link" onclick="showView('admin-materials')">Materials</button>
+                    <button class="nav-link" onclick="showView('admin-settings')">Settings</button>
+                    <button class="nav-link" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+            <div style="max-width:1000px;margin:0 auto;padding:1.5rem;">
+                <div class="flex-between mb-2">
+                    <h2 style="font-weight:800;">Courses & Lessons</h2>
+                    <button class="btn btn-primary" onclick="showAddCourseModal()">Add Course</button>
+                </div>
+                <div id="admin-courses-list"></div>
+            </div>
+        `;
+        loadAdminCourses();
+    }
+
+    async function loadAdminCourses() {
+        const container = document.getElementById('admin-courses-list');
+        if (!container) return;
+        
+        try {
+            const { data: courses, error } = await db
+                .from('courses')
+                .select('*, lessons(*)')
+                .order('created_at');
+            if (error) throw error;
+            
+            container.innerHTML = courses?.map(c => `
+                <div class="card mb-1">
+                    <div class="flex-between">
+                        <div>
+                            <h3 style="font-weight:700;">${c.title}</h3>
+                            <p style="color:#4A5D52;font-size:0.9rem;">${c.description || ''}</p>
+                            <p style="color:#7A8A80;font-size:0.8rem;">${c.course_code} | ${c.lessons?.length || 0} lessons</p>
+                        </div>
+                        <div style="display:flex;gap:0.5rem;">
+                            <button class="btn btn-secondary btn-sm" onclick="showAddLessonModal('${c.id}')">Add Lesson</button>
+                            <button class="btn btn-ghost btn-sm" onclick="toggleCourseStatus('${c.id}', '${c.status}')">${c.status === 'active' ? 'Deactivate' : 'Activate'}</button>
+                        </div>
+                    </div>
+                    ${c.lessons?.length ? `
+                        <div style="margin-top:1rem;padding-left:1rem;border-left:3px solid var(--border);">
+                            ${c.lessons.map(l => `
+                                <div class="flex-between" style="padding:0.4rem 0;">
+                                    <span>Lesson ${l.lesson_number}: ${l.title}</span>
+                                    <span class="badge ${l.status === 'active' ? 'badge-active' : 'badge-inactive'}">${l.status}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p style="color:#7A8A80;margin-top:0.5rem;font-size:0.85rem;">No lessons yet</p>'}
+                </div>
+            `).join('') || '<div class="card"><p>No courses created yet.</p></div>';
+        } catch (error) {
+            console.error('Courses load error:', error);
+            container.innerHTML = '<div class="card"><p style="color:#7F1D1D;">Error loading courses.</p></div>';
+        }
+    }
+
+    function showAddCourseModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal">
+                <h2 style="font-weight:800;margin-bottom:1rem;">Add Course</h2>
+                <form onsubmit="handleAddCourse(event)">
+                    <div class="form-group">
+                        <label class="form-label">Course Code</label>
+                        <input type="text" id="new-course-code" class="form-input" required placeholder="COURSE-001">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Title</label>
+                        <input type="text" id="new-course-title" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea id="new-course-desc" class="form-textarea"></textarea>
+                    </div>
+                    <div style="display:flex;gap:1rem;justify-content:flex-end;">
+                        <button type="button" class="btn btn-ghost" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    async function handleAddCourse(event) {
+        event.preventDefault();
+        try {
+            await db.from('courses').insert({
+                course_code: document.getElementById('new-course-code').value,
+                title: document.getElementById('new-course-title').value,
+                description: document.getElementById('new-course-desc').value
+            });
+            showToast('Course created', 'success');
+            document.querySelector('.modal-overlay')?.remove();
+            loadAdminCourses();
+        } catch (error) {
+            showToast('Error creating course: ' + error.message, 'error');
+        }
+    }
+
+    function showAddLessonModal(courseId) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal">
+                <h2 style="font-weight:800;margin-bottom:1rem;">Add Lesson</h2>
+                <form onsubmit="handleAddLesson(event, '${courseId}')">
+                    <div class="form-group">
+                        <label class="form-label">Lesson Number</label>
+                        <input type="number" id="new-lesson-number" class="form-input" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Title</label>
+                        <input type="text" id="new-lesson-title" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea id="new-lesson-desc" class="form-textarea"></textarea>
+                    </div>
+                    <div style="display:flex;gap:1rem;justify-content:flex-end;">
+                        <button type="button" class="btn btn-ghost" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Lesson</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    async function handleAddLesson(event, courseId) {
+        event.preventDefault();
+        try {
+            const lessonNumber = parseInt(document.getElementById('new-lesson-number').value);
+            const lessonCode = `LESSON-${String(lessonNumber).padStart(3, '0')}`;
+            await db.from('lessons').insert({
+                course_id: courseId,
+                lesson_code: lessonCode,
+                lesson_number: lessonNumber,
+                title: document.getElementById('new-lesson-title').value,
+                description: document.getElementById('new-lesson-desc').value
+            });
+            showToast('Lesson created', 'success');
+            document.querySelector('.modal-overlay')?.remove();
+            loadAdminCourses();
+        } catch (error) {
+            showToast('Error creating lesson: ' + error.message, 'error');
+        }
+    }
+
+    async function toggleCourseStatus(courseId, currentStatus) {
+        const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+        try {
+            await db.from('courses').update({ status: newStatus }).eq('id', courseId);
+            showToast('Course status updated', 'success');
+            loadAdminCourses();
+        } catch (error) {
+            showToast('Error updating course', 'error');
+        }
+    }
+
+    function renderAdminTests(app) {
+        app.innerHTML = `
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="logo-icon">TMS</span>
+                    <span class="brand-text">${appState.systemSettings?.organization_name || 'TMS'}</span>
+                </div>
+                <div class="navbar-nav">
+                    <button class="nav-link" onclick="showView('admin-dashboard')">Dashboard</button>
+                    <button class="nav-link" onclick="showView('admin-students')">Students</button>
+                    <button class="nav-link" onclick="showView('admin-courses')">Courses</button>
+                    <button class="nav-link active" onclick="showView('admin-tests')">Tests</button>
+                    <button class="nav-link" onclick="showView('admin-import')">Import</button>
+                    <button class="nav-link" onclick="showView('admin-materials')">Materials</button>
+                    <button class="nav-link" onclick="showView('admin-settings')">Settings</button>
+                    <button class="nav-link" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+            <div style="max-width:1000px;margin:0 auto;padding:1.5rem;">
+                <div class="flex-between mb-2">
+                    <h2 style="font-weight:800;">Tests</h2>
+                    <button class="btn btn-primary" onclick="showView('admin-import')">Import Test</button>
+                </div>
+                <div id="admin-tests-list"></div>
+            </div>
+        `;
+        loadAdminTests();
+    }
+
+    async function loadAdminTests() {
+        const container = document.getElementById('admin-tests-list');
+        if (!container) return;
+        
+        try {
+            const { data: tests, error } = await db
+                .from('tests')
+                .select('*, lessons(title, courses(title)), questions(count)')
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            
+            container.innerHTML = tests?.map(t => `
+                <div class="card mb-1">
+                    <div class="flex-between flex-wrap gap-2">
+                        <div>
+                            <h3 style="font-weight:700;">${t.title}</h3>
+                            <p style="color:#7A8A80;font-size:0.85rem;">${t.lessons?.courses?.title || ''} > ${t.lessons?.title || ''}</p>
+                            <p style="color:#7A8A80;font-size:0.8rem;">${t.test_code} | ${t.questions?.[0]?.count || 0} questions | Passing: ${t.passing_percentage}% | Attempts: ${t.attempt_policy}</p>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <span class="badge ${t.status === 'published' ? 'badge-published' : 'badge-draft'}">${t.status}</span>
+                            <button class="btn btn-secondary btn-sm" onclick="toggleTestStatus('${t.id}', '${t.status}')">
+                                ${t.status === 'published' ? 'Unpublish' : 'Publish'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('') || '<div class="card"><p>No tests created yet. Use Import to create tests.</p></div>';
+        } catch (error) {
+            console.error('Tests load error:', error);
+            container.innerHTML = '<div class="card"><p style="color:#7F1D1D;">Error loading tests.</p></div>';
+        }
+    }
+
+    async function toggleTestStatus(testId, currentStatus) {
+        const newStatus = currentStatus === 'published' ? 'draft' : 'published';
+        try {
+            await db.from('tests').update({ status: newStatus }).eq('id', testId);
+            showToast('Test status updated', 'success');
+            loadAdminTests();
+        } catch (error) {
+            showToast('Error updating test', 'error');
+        }
+    }
+
+    function renderAdminImport(app) {
+        app.innerHTML = `
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="logo-icon">TMS</span>
+                    <span class="brand-text">${appState.systemSettings?.organization_name || 'TMS'}</span>
+                </div>
+                <div class="navbar-nav">
+                    <button class="nav-link" onclick="showView('admin-dashboard')">Dashboard</button>
+                    <button class="nav-link" onclick="showView('admin-students')">Students</button>
+                    <button class="nav-link" onclick="showView('admin-courses')">Courses</button>
+                    <button class="nav-link" onclick="showView('admin-tests')">Tests</button>
+                    <button class="nav-link active" onclick="showView('admin-import')">Import</button>
+                    <button class="nav-link" onclick="showView('admin-materials')">Materials</button>
+                    <button class="nav-link" onclick="showView('admin-settings')">Settings</button>
+                    <button class="nav-link" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+            <div style="max-width:800px;margin:0 auto;padding:1.5rem;">
+                <h2 style="font-weight:800;margin-bottom:1rem;">Import Test Data</h2>
+                <div class="card mb-2">
+                    <h3 style="font-weight:700;margin-bottom:1rem;">Upload CSV or JSON</h3>
+                    <div class="form-group">
+                        <label class="form-label">File Type</label>
+                        <select id="import-file-type" class="form-select" onchange="toggleImportFileInput()">
+                            <option value="csv">CSV</option>
+                            <option value="json">JSON</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Upload File</label>
+                        <input type="file" id="import-file-input" class="form-input" accept=".csv,.json" onchange="previewImportFile(this)">
+                    </div>
+                </div>
+                <div id="import-preview"></div>
+                <div style="margin-top:1rem;">
+                    <h3 style="font-weight:700;margin-bottom:0.5rem;">Download Templates</h3>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                        <button class="btn btn-secondary btn-sm" onclick="downloadCSVTemplate()">CSV Template</button>
+                        <button class="btn btn-secondary btn-sm" onclick="downloadJSONTemplate()">JSON Template</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function toggleImportFileInput() {
+        const type = document.getElementById('import-file-type')?.value;
+        const input = document.getElementById('import-file-input');
+        if (input) input.accept = type === 'csv' ? '.csv' : '.json';
+    }
+
+    function downloadCSVTemplate() {
+        const template = `test_id,course_id,lesson_id,course_name,lesson_name,test_title,test_description,question_number,question,option_a,option_b,option_c,option_d,correct_answer,marks,passing_percentage,status
+TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Research,Product Research Test,Lessons 1-3 Assessment,1,What is the first step in product research?,Define target market,Find suppliers,Create listings,Set prices,A,4,50,published`;
+        const blob = new Blob([template], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sample-test-template.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function downloadJSONTemplate() {
+        const template = {
+            test: {
+                test_id: "TEST-001",
+                course_id: "COURSE-001",
+                lesson_id: "LESSON-001",
+                title: "Product Research Test",
+                description: "Lessons 1-3 Assessment",
+                passing_percentage: 50,
+                status: "published"
+            },
+            questions: [
+                {
+                    question_number: 1,
+                    question: "Question text here",
+                    options: {
+                        A: "Option A",
+                        B: "Option B",
+                        C: "Option C",
+                        D: "Option D"
+                    },
+                    correct_answer: "C",
+                    marks: 4
+                }
+            ]
+        };
+        const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sample-test-template.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    async function previewImportFile(input) {
+        const file = input.files?.[0];
+        if (!file) return;
+        
+        const type = document.getElementById('import-file-type')?.value || 'csv';
+        const preview = document.getElementById('import-preview');
+        
+        try {
+            const content = await file.text();
+            let parsed;
+            
+            if (type === 'csv') {
+                parsed = parseCSV(content);
+            } else {
+                parsed = parseJSON(content);
+            }
+            
+            const questions = parsed.questions || [];
+            const totalMarks = questions.reduce((sum, q) => sum + (q.marks || 0), 0);
+            const passingPct = parsed.test?.passing_percentage || 50;
+            const errors = validateImport(parsed);
+            
+            appState.importPreview = { parsed, errors, fileName: file.name };
+            
+            preview.innerHTML = `
+                <div class="card">
+                    <h3 style="font-weight:700;margin-bottom:1rem;">Import Preview</h3>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.5rem;margin-bottom:1rem;">
+                        <div class="stat-card"><div class="stat-label">File</div><div class="stat-value" style="font-size:1rem;">${file.name}</div></div>
+                        <div class="stat-card"><div class="stat-label">Questions</div><div class="stat-value">${questions.length}</div></div>
+                        <div class="stat-card"><div class="stat-label">Total Marks</div><div class="stat-value">${totalMarks}</div></div>
+                        <div class="stat-card"><div class="stat-label">Passing %</div><div class="stat-value">${passingPct}%</div></div>
+                        <div class="stat-card"><div class="stat-label">Errors</div><div class="stat-value" style="color:${errors.length ? '#7F1D1D' : '#166534'};">${errors.length}</div></div>
+                        <div class="stat-card"><div class="stat-label">Test ID</div><div class="stat-value" style="font-size:1rem;">${parsed.test?.test_id || 'N/A'}</div></div>
+                    </div>
+                    ${errors.length ? `
+                        <div style="background:#FEE2E2;border-radius:8px;padding:1rem;margin-bottom:1rem;">
+                            <p style="font-weight:700;color:#991B1B;">Errors Found:</p>
+                            ${errors.map(e => `<p style="color:#991B1B;font-size:0.85rem;">${e}</p>`).join('')}
+                        </div>
+                    ` : ''}
+                    <div style="display:flex;gap:1rem;justify-content:flex-end;">
+                        <button class="btn btn-ghost" onclick="document.getElementById('import-preview').innerHTML=''; appState.importPreview=null;">Cancel</button>
+                        <button class="btn btn-primary" onclick="executeImport()" ${errors.length ? 'disabled' : ''}>Import Test</button>
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            preview.innerHTML = `<div class="card"><p style="color:#7F1D1D;">Error parsing file: ${error.message}</p></div>`;
+        }
+    }
+
+    function parseCSV(content) {
+        const lines = content.split('\n').filter(l => l.trim());
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        
+        const data = [];
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',');
+            const row = {};
+            headers.forEach((h, j) => row[h] = values[j]?.trim() || '');
+            data.push(row);
+        }
+        
+        if (!data.length) throw new Error('No data rows found');
+        
+        const firstRow = data[0];
+        const test = {
+            test_id: firstRow.test_id,
+            course_id: firstRow.course_id,
+            lesson_id: firstRow.lesson_id,
+            title: firstRow.test_title,
+            description: firstRow.test_description,
+            passing_percentage: parseFloat(firstRow.passing_percentage) || 50,
+            status: firstRow.status || 'draft'
+        };
+        
+        const questions = data.map(row => ({
+            question_number: parseInt(row.question_number),
+            question: row.question,
+            options: {
+                A: row.option_a,
+                B: row.option_b,
+                C: row.option_c,
+                D: row.option_d
+            },
+            correct_answer: row.correct_answer?.toUpperCase(),
+            marks: parseFloat(row.marks) || 1
+        }));
+        
+        return { test, questions };
+    }
+
+    function parseJSON(content) {
+        const data = JSON.parse(content);
+        if (!data.test || !data.questions?.length) throw new Error('Invalid JSON structure');
+        
+        const questions = data.questions.map(q => ({
+            question_number: q.question_number,
+            question: q.question,
+            options: {
+                A: q.options?.A || q.option_a,
+                B: q.options?.B || q.option_b,
+                C: q.options?.C || q.option_c,
+                D: q.options?.D || q.option_d
+            },
+            correct_answer: q.correct_answer?.toUpperCase(),
+            marks: q.marks || 1
+        }));
+        
+        return { test: data.test, questions };
+    }
+
+    function validateImport(parsed) {
+        const errors = [];
+        const questions = parsed.questions || [];
+        const test = parsed.test || {};
+        
+        if (!test.test_id) errors.push('Missing test_id');
+        if (!test.course_id) errors.push('Missing course_id');
+        if (!test.lesson_id) errors.push('Missing lesson_id');
+        if (!test.title) errors.push('Missing test title');
+        
+        const questionNumbers = new Set();
+        questions.forEach((q, i) => {
+            if (!q.question_number) errors.push(`Question ${i + 1}: Missing question_number`);
+            if (!q.question) errors.push(`Question ${i + 1}: Missing question text`);
+            if (!q.options?.A) errors.push(`Question ${i + 1}: Missing option A`);
+            if (!q.options?.B) errors.push(`Question ${i + 1}: Missing option B`);
+            if (!q.options?.C) errors.push(`Question ${i + 1}: Missing option C`);
+            if (!q.options?.D) errors.push(`Question ${i + 1}: Missing option D`);
+            if (!q.correct_answer || !['A', 'B', 'C', 'D'].includes(q.correct_answer)) 
+                errors.push(`Question ${i + 1}: Invalid correct_answer (must be A, B, C, or D)`);
+            if (!q.marks || q.marks <= 0) errors.push(`Question ${i + 1}: Invalid marks`);
+            if (q.question_number && questionNumbers.has(q.question_number)) 
+                errors.push(`Question ${i + 1}: Duplicate question_number ${q.question_number}`);
+            if (q.question_number) questionNumbers.add(q.question_number);
+        });
+        
+        return errors;
+    }
+
+    async function executeImport() {
+        if (!appState.importPreview) return;
+        
+        const { parsed, fileName } = appState.importPreview;
+        const errors = appState.importPreview.errors;
+        
+        if (errors.length) {
+            showToast('Fix errors before importing', 'error');
+            return;
+        }
+        
+        try {
+            let courseId;
+            const { data: existingCourse } = await db
+                .from('courses')
+                .select('id')
+                .eq('course_code', parsed.test.course_id)
+                .single();
+            
+            if (existingCourse) {
+                courseId = existingCourse.id;
+            } else {
+                const { data: newCourse, error: courseError } = await db
+                    .from('courses')
+                    .insert({
+                        course_code: parsed.test.course_id,
+                        title: parsed.test.course_name || parsed.test.course_id,
+                        description: 'Imported via test upload'
+                    })
+                    .select()
+                    .single();
+                if (courseError) throw courseError;
+                courseId = newCourse.id;
+            }
+            
+            let lessonId;
+            const { data: existingLesson } = await db
+                .from('lessons')
+                .select('id')
+                .eq('lesson_code', parsed.test.lesson_id)
+                .single();
+            
+            if (existingLesson) {
+                lessonId = existingLesson.id;
+            } else {
+                const { data: newLesson, error: lessonError } = await db
+                    .from('lessons')
+                    .insert({
+                        course_id: courseId,
+                        lesson_code: parsed.test.lesson_id,
+                        lesson_number: 1,
+                        title: parsed.test.lesson_name || parsed.test.lesson_id
+                    })
+                    .select()
+                    .single();
+                if (lessonError) throw lessonError;
+                lessonId = newLesson.id;
+            }
+            
+            const { data: newTest, error: testError } = await db
+                .from('tests')
+                .insert({
+                    test_code: parsed.test.test_id,
+                    lesson_id: lessonId,
+                    title: parsed.test.title,
+                    description: parsed.test.description,
+                    passing_percentage: parsed.test.passing_percentage || 50,
+                    status: parsed.test.status || 'draft',
+                    attempt_policy: 'one_attempt',
+                    max_attempts: 1
+                })
+                .select()
+                .single();
+            if (testError) throw testError;
+            
+            for (const q of parsed.questions) {
+                const { error: qError } = await db.from('questions').insert({
+                    test_id: newTest.id,
+                    question_number: q.question_number,
+                    question_text: q.question,
+                    option_a: q.options.A,
+                    option_b: q.options.B,
+                    option_c: q.options.C,
+                    option_d: q.options.D,
+                    correct_answer: q.correct_answer,
+                    marks: q.marks
+                });
+                if (qError) throw qError;
+            }
+            
+            await db.from('import_history').insert({
+                file_name: fileName,
+                test_code: parsed.test.test_id,
+                questions_count: parsed.questions.length,
+                status: 'success',
+                imported_by: appState.user?.id
+            });
+            
+            document.getElementById('import-preview').innerHTML = '';
+            document.getElementById('import-file-input').value = '';
+            appState.importPreview = null;
+            
+            showToast('Test imported successfully!', 'success');
+        } catch (error) {
+            console.error('Import error:', error);
+            showToast('Import failed: ' + error.message, 'error');
+        }
+    }
+
+    function renderAdminMaterials(app) {
+        app.innerHTML = `
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="logo-icon">TMS</span>
+                    <span class="brand-text">${appState.systemSettings?.organization_name || 'TMS'}</span>
+                </div>
+                <div class="navbar-nav">
+                    <button class="nav-link" onclick="showView('admin-dashboard')">Dashboard</button>
+                    <button class="nav-link" onclick="showView('admin-students')">Students</button>
+                    <button class="nav-link" onclick="showView('admin-courses')">Courses</button>
+                    <button class="nav-link" onclick="showView('admin-tests')">Tests</button>
+                    <button class="nav-link" onclick="showView('admin-import')">Import</button>
+                    <button class="nav-link active" onclick="showView('admin-materials')">Materials</button>
+                    <button class="nav-link" onclick="showView('admin-settings')">Settings</button>
+                    <button class="nav-link" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+            <div style="max-width:800px;margin:0 auto;padding:1.5rem;">
+                <h2 style="font-weight:800;margin-bottom:1rem;">Lesson Materials</h2>
+                <div class="card mb-2">
+                    <h3 style="font-weight:700;margin-bottom:1rem;">Upload Material</h3>
+                    <form onsubmit="handleUploadMaterial(event)">
+                        <div class="form-group">
+                            <label class="form-label">Lesson</label>
+                            <select id="material-lesson" class="form-select" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Title</label>
+                            <input type="text" id="material-title" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">File</label>
+                            <input type="file" id="material-file" class="form-input" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </form>
+                </div>
+                <div id="materials-list"></div>
+            </div>
+        `;
+        loadMaterialsData();
+    }
+
+    async function loadMaterialsData() {
+        const lessonSelect = document.getElementById('material-lesson');
+        if (lessonSelect) {
+            const { data: lessons } = await db.from('lessons').select('*').eq('status', 'active').order('lesson_number');
+            lessonSelect.innerHTML = lessons?.map(l => `<option value="${l.id}">${l.title}</option>`).join('') || '<option value="">No lessons</option>';
+        }
+        
+        const container = document.getElementById('materials-list');
+        if (!container) return;
+        
+        const { data: materials, error } = await db
+            .from('lesson_materials')
+            .select('*, lessons(title)');
+        if (error) {
+            container.innerHTML = '<div class="card"><p style="color:#7F1D1D;">Error loading materials.</p></div>';
+            return;
+        }
+        
+        container.innerHTML = materials?.length ? materials.map(m => `
+            <div class="card mb-1">
+                <div class="flex-between">
+                    <div>
+                        <p style="font-weight:600;">${m.title}</p>
+                        <p style="font-size:0.85rem;color:#7A8A80;">${m.lessons?.title || ''} | ${m.file_type || ''}</p>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" onclick="deleteMaterial('${m.id}')">Delete</button>
+                </div>
+            </div>
+        `).join('') : '<div class="card"><p>No materials uploaded yet.</p></div>';
+    }
+
+    async function handleUploadMaterial(event) {
+        event.preventDefault();
+        const lessonId = document.getElementById('material-lesson').value;
+        const title = document.getElementById('material-title').value;
+        const file = document.getElementById('material-file').files?.[0];
+        if (!file) return;
+        
+        try {
+            const filePath = `lesson_${lessonId}_${Date.now()}_${file.name}`;
+            const { error: uploadError } = await db.storage
+                .from('materials')
+                .upload(filePath, file);
+            if (uploadError) throw uploadError;
+            
+            await db.from('lesson_materials').insert({
+                lesson_id: lessonId,
+                title: title,
+                file_path: filePath,
+                file_type: file.type,
+                file_size: file.size,
+                access_level: 'enrolled_students'
+            });
+            
+            showToast('Material uploaded successfully', 'success');
+            document.getElementById('material-title').value = '';
+            document.getElementById('material-file').value = '';
+            loadMaterialsData();
+        } catch (error) {
+            console.error('Upload error:', error);
+            showToast('Upload failed: ' + error.message, 'error');
+        }
+    }
+
+    async function deleteMaterial(materialId) {
+        if (!confirm('Delete this material?')) return;
+        try {
+            await db.from('lesson_materials').delete().eq('id', materialId);
+            showToast('Material deleted', 'success');
+            loadMaterialsData();
+        } catch (error) {
+            showToast('Error deleting material', 'error');
+        }
+    }
+
+    function renderAdminSettings(app) {
+        app.innerHTML = `
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <span class="logo-icon">TMS</span>
+                    <span class="brand-text">${appState.systemSettings?.organization_name || 'TMS'}</span>
+                </div>
+                <div class="navbar-nav">
+                    <button class="nav-link" onclick="showView('admin-dashboard')">Dashboard</button>
+                    <button class="nav-link" onclick="showView('admin-students')">Students</button>
+                    <button class="nav-link" onclick="showView('admin-courses')">Courses</button>
+                    <button class="nav-link" onclick="showView('admin-tests')">Tests</button>
+                    <button class="nav-link" onclick="showView('admin-import')">Import</button>
+                    <button class="nav-link" onclick="showView('admin-materials')">Materials</button>
+                    <button class="nav-link active" onclick="showView('admin-settings')">Settings</button>
+                    <button class="nav-link" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+            <div style="max-width:700px;margin:0 auto;padding:1.5rem;">
+                <h2 style="font-weight:800;margin-bottom:1rem;">Admin Settings</h2>
+                <div class="card mb-2">
+                    <h3 style="font-weight:700;margin-bottom:1rem;">Organization Settings</h3>
+                    <form onsubmit="handleSaveSettings(event)">
+                        <div class="form-group">
+                            <label class="form-label">Organization Name</label>
+                            <input type="text" id="setting-org-name" class="form-input" value="${appState.systemSettings?.organization_name || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="setting-org-email" class="form-input" value="${appState.systemSettings?.organization_email || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="text" id="setting-org-phone" class="form-input" value="${appState.systemSettings?.phone || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Website</label>
+                            <input type="text" id="setting-org-website" class="form-input" value="${appState.systemSettings?.website || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Address</label>
+                            <input type="text" id="setting-org-address" class="form-input" value="${appState.systemSettings?.address || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Report Title</label>
+                            <input type="text" id="setting-report-title" class="form-input" value="${appState.systemSettings?.report_title || 'Student Assessment Report'}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Report Footer</label>
+                            <input type="text" id="setting-report-footer" class="form-input" value="${appState.systemSettings?.report_footer || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Support Contact</label>
+                            <input type="text" id="setting-support" class="form-input" value="${appState.systemSettings?.support_contact || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Default Passing Percentage</label>
+                            <input type="number" id="setting-passing" class="form-input" min="0" max="100" value="${appState.systemSettings?.default_passing_percentage || 50}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Self Registration</label>
+                            <select id="setting-self-reg" class="form-select">
+                                <option value="true" ${appState.systemSettings?.self_registration_enabled ? 'selected' : ''}>Enabled</option>
+                                <option value="false" ${!appState.systemSettings?.self_registration_enabled ? 'selected' : ''}>Disabled</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3 style="font-weight:700;margin-bottom:1rem;">Admin Profile</h3>
+                    <p style="color:#4A5D52;margin-bottom:1rem;">Manage your admin account settings.</p>
+                    <div class="form-group">
+                        <label class="form-label">Change Password</label>
+                        <input type="password" id="admin-new-password" class="form-input" placeholder="New password" minlength="6">
+                    </div>
+                    <button class="btn btn-primary" onclick="handleAdminPasswordChange()">Update Password</button>
+                </div>
+            </div>
+        `;
+    }
+
+    async function handleSaveSettings(event) {
+        event.preventDefault();
+        try {
+            const settings = {
+                organization_name: document.getElementById('setting-org-name').value,
+                organization_email: document.getElementById('setting-org-email').value,
+                phone: document.getElementById('setting-org-phone').value,
+                website: document.getElementById('setting-org-website').value,
+                address: document.getElementById('setting-org-address').value,
+                report_title: document.getElementById('setting-report-title').value,
+                report_footer: document.getElementById('setting-report-footer').value,
+                support_contact: document.getElementById('setting-support').value,
+                default_passing_percentage: parseFloat(document.getElementById('setting-passing').value) || 50,
+                self_registration_enabled: document.getElementById('setting-self-reg').value === 'true'
+            };
+            
+            const { error } = await db.from('system_settings')
+                .update(settings)
+                .eq('id', 1);
+            if (error) throw error;
+            
+            await loadSystemSettings();
+            showToast('Settings saved successfully', 'success');
+        } catch (error) {
+            console.error('Settings save error:', error);
+            showToast('Error saving settings: ' + error.message, 'error');
+        }
+    }
+
+    async function handleAdminPasswordChange() {
+        const password = document.getElementById('admin-new-password')?.value;
+        if (!password || password.length < 6) {
+            showToast('Password must be at least 6 characters', 'error');
+            return;
+        }
+        await handleChangePassword(password);
+        document.getElementById('admin-new-password').value = '';
+    }
+
+    function renderNotFound(app) {
+        app.innerHTML = `
+            <div style="padding:4rem 2rem;text-align:center;">
+                <h2 style="font-weight:800;color:#7F1D1D;">Page Not Found</h2>
+                <p style="color:#4A5D52;margin:1rem 0;">The requested page does not exist.</p>
+                <button class="btn btn-primary" onclick="showView('${appState.user ? (appState.isAdmin ? 'admin-dashboard' : 'student-dashboard') : 'login'}')">
+                    Go Back
+                </button>
+            </div>
+        `;
+    }
+
+    function startTestTimer() {
+        stopTestTimer();
+        appState.testTimerInterval = setInterval(() => {
+            appState.testTimeRemaining--;
+            if (appState.testTimeRemaining <= 0) {
+                stopTestTimer();
+                showToast('Time expired! Submitting test...', 'info');
+                submitTest();
+                return;
+            }
+            const timerElement = document.querySelector('.test-timer span');
+            if (timerElement) {
+                const mins = Math.floor(appState.testTimeRemaining / 60);
+                const secs = appState.testTimeRemaining % 60;
+                timerElement.textContent = `Time Remaining: ${mins}:${secs.toString().padStart(2, '0')}`;
+                if (appState.testTimeRemaining < 60) {
+                    document.querySelector('.test-timer')?.classList.add('warning');
+                }
+            }
+        }, 1000);
+    }
+
+    function stopTestTimer() {
+        if (appState.testTimerInterval) {
+            clearInterval(appState.testTimerInterval);
+            appState.testTimerInterval = null;
+        }
+    }
+
+    window.handleLoginForm = async function(event) {
+        event.preventDefault();
+        const email = document.getElementById('login-email')?.value;
+        const password = document.getElementById('login-password')?.value;
+        if (email && password) {
+            await handleLogin(email, password);
+        }
+    };
+
+    window.handleSignupForm = async function(event) {
+        event.preventDefault();
+        const name = document.getElementById('signup-name')?.value;
+        const email = document.getElementById('signup-email')?.value;
+        const password = document.getElementById('signup-password')?.value;
+        if (name && email && password) {
+            await handleSignup(name, email, password);
+        }
+    };
+
+    window.handleForgotPasswordForm = async function(event) {
+        event.preventDefault();
+        const email = document.getElementById('forgot-email')?.value;
+        if (email) {
+            await handleForgotPassword(email);
+        }
+    };
+
+    window.openStudentCourse = function(courseId) {
+        showView('student-course', { courseId });
+    };
+
+    window.openStudentLesson = function(lessonId) {
+        showView('student-lesson', { lessonId });
+    };
+
+    window.startStudentTest = function(testId) {
+        showView('student-test', { testId });
+    };
+
+    window.viewStudentReport = function(attemptId) {
+        showView('student-reports');
+        showToast('Report viewing coming soon', 'info');
+    };
+
+    window.changePasswordFromProfile = changePasswordFromProfile;
+    window.handleAddStudent = handleAddStudent;
+    window.handleAddCourse = handleAddCourse;
+    window.handleAddLesson = handleAddLesson;
+    window.handleUploadMaterial = handleUploadMaterial;
+    window.handleSaveSettings = handleSaveSettings;
+    window.handleAdminPasswordChange = handleAdminPasswordChange;
+    window.toggleImportFileInput = toggleImportFileInput;
+    window.previewImportFile = previewImportFile;
+    window.executeImport = executeImport;
+    window.downloadCSVTemplate = downloadCSVTemplate;
+    window.downloadJSONTemplate = downloadJSONTemplate;
+    window.downloadMaterial = downloadMaterial;
+    window.selectAnswer = selectAnswer;
+    window.navigateQuestion = navigateQuestion;
+    window.jumpToQuestion = jumpToQuestion;
+    window.confirmSubmitTest = confirmSubmitTest;
+    window.filterStudents = filterStudents;
+    window.showAddStudentModal = showAddStudentModal;
+    window.showAddCourseModal = showAddCourseModal;
+    window.showAddLessonModal = showAddLessonModal;
+    window.toggleCourseStatus = toggleCourseStatus;
+    window.toggleTestStatus = toggleTestStatus;
+    window.viewStudentAttemptDetail = viewStudentAttemptDetail;
+    window.deleteMaterial = deleteMaterial;
+    window.loadAdminStudents = loadAdminStudents;
+    window.loadAdminCourses = loadAdminCourses;
+    window.loadAdminTests = loadAdminTests;
+    window.loadLessonPerformance = loadLessonPerformance;
+    window.loadStudentDashboardData = loadStudentDashboardData;
+    window.loadStudentDashboard = function() { showView('student-dashboard'); };
+    window.showView = showView;
+    window.handleLogout = handleLogout;
+
+    async function initializeApp() {
+        renderLoading(document.getElementById('app'));
+        
+        if (!initializeSupabase()) {
+            return;
+        }
+        
+        await checkSession();
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeApp);
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        initializeApp();
+    }
+    </script>
+</body>
+</html>
