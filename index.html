@@ -45,7 +45,6 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Utility */
         .hidden { display: none !important; }
         .text-center { text-align: center; }
         .text-right { text-align: right; }
@@ -65,7 +64,6 @@
         .gap-3 { gap: 1.5rem; }
         .flex-wrap { flex-wrap: wrap; }
 
-        /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -139,7 +137,6 @@
             color: var(--white);
         }
 
-        /* Cards */
         .card {
             background: var(--white);
             border-radius: var(--radius-lg);
@@ -168,7 +165,6 @@
             margin-top: 0.25rem;
         }
 
-        /* Forms */
         .form-group { margin-bottom: 1rem; }
         .form-label {
             display: block;
@@ -218,7 +214,6 @@
         }
         .form-success.visible { display: block; }
 
-        /* Tables */
         .table-container {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -269,7 +264,6 @@
         .badge-published { background: #DCFCE7; color: #166534; }
         .badge-draft { background: #FEF9C3; color: #854D0E; }
 
-        /* Navigation */
         .navbar {
             background: var(--white);
             border-bottom: 1px solid var(--border);
@@ -333,7 +327,6 @@
             color: var(--forest-green);
         }
 
-        /* Dashboard Cards */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -372,7 +365,6 @@
             margin-top: 0.2rem;
         }
 
-        /* Tabs */
         .tabs {
             display: flex;
             gap: 0.25rem;
@@ -404,7 +396,6 @@
             border-bottom-color: var(--forest-green);
         }
 
-        /* Test Interface */
         .test-container {
             max-width: 800px;
             margin: 0 auto;
@@ -511,7 +502,6 @@
             50% { opacity: 0.6; }
         }
 
-        /* Auth Pages */
         .auth-container {
             max-width: 440px;
             margin: 2rem auto;
@@ -536,14 +526,12 @@
             margin-bottom: 1.5rem;
         }
 
-        /* Setup Screen */
         .setup-container {
             max-width: 600px;
             margin: 3rem auto;
             padding: 0 1rem;
         }
 
-        /* Report */
         .report-preview {
             background: var(--white);
             border-radius: var(--radius-lg);
@@ -597,7 +585,6 @@
             border: 2px solid #991B1B;
         }
 
-        /* Mobile Table Cards */
         @media (max-width: 768px) {
             .data-table { font-size: 0.8rem; }
             .data-table th, .data-table td { padding: 0.5rem 0.6rem; }
@@ -620,7 +607,6 @@
             .btn { padding: 0.6rem 1rem; font-size: 0.85rem; min-height: 38px; }
         }
 
-        /* Print styles for PDF */
         @media print {
             body * { visibility: hidden; }
             .print-area, .print-area * { visibility: visible; }
@@ -634,7 +620,6 @@
             .no-print { display: none !important; }
         }
 
-        /* Loading Spinner */
         .spinner {
             width: 24px;
             height: 24px;
@@ -646,7 +631,6 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -673,7 +657,6 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-        /* Modal */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -704,32 +687,17 @@
     </style>
 </head>
 <body>
-    <!-- ===================================================== -->
-    <!-- APP CONTAINER -->
-    <!-- ===================================================== -->
-    <div id="app">
-        <!-- Content injected by JavaScript -->
-    </div>
-
-    <!-- Toast Container -->
+    <div id="app"></div>
     <div id="toast-container"></div>
 
-    <!-- ===================================================== -->
-    <!-- JAVASCRIPT APPLICATION -->
-    <!-- ===================================================== -->
     <script>
     // =====================================================
     // CONFIGURATION
     // =====================================================
-    // IMPORTANT: Replace these values with your Supabase project details.
-    // You can find these in Supabase Dashboard > Project Settings > API
     const SUPABASE_URL = 'https://xukwxujvhkbqprcfmfyb.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1a3d4dWp2aGticXByY2ZtZnliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NjE0MzEsImV4cCI6MjEwNDUzNzQzMX0.3kCMvd-f9mooJZa7tAVNyE2aFJj9ek6vkPoUMaXeshE';
     // =====================================================
 
-    // =====================================================
-    // STATE MANAGEMENT
-    // =====================================================
     const appState = {
         currentView: 'loading',
         user: null,
@@ -762,10 +730,7 @@
         sortBy: 'newest'
     };
 
-    // =====================================================
-    // SUPABASE CLIENT INITIALIZATION
-    // =====================================================
-    let supabase = null;
+    let db = null;
 
     function initializeSupabase() {
         try {
@@ -777,7 +742,7 @@
                 showSetupScreen();
                 return false;
             }
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             return true;
         } catch (error) {
             console.error('Supabase initialization error:', error);
@@ -786,9 +751,6 @@
         }
     }
 
-    // =====================================================
-    // SAFE ROUTER (No hash routing - avoids Location.hash error)
-    // =====================================================
     function showView(viewName, params = {}) {
         appState.currentView = viewName;
         appState.currentParams = params;
@@ -798,77 +760,31 @@
     function render() {
         const app = document.getElementById('app');
         const view = appState.currentView;
-        
-        // Clear current view
         app.innerHTML = '';
         
         try {
             switch (view) {
-                case 'loading':
-                    renderLoading(app);
-                    break;
-                case 'setup':
-                    renderSetupScreen(app);
-                    break;
-                case 'login':
-                    renderLogin(app);
-                    break;
-                case 'signup':
-                    renderSignup(app);
-                    break;
-                case 'forgot-password':
-                    renderForgotPassword(app);
-                    break;
-                case 'student-dashboard':
-                    renderStudentDashboard(app);
-                    break;
-                case 'student-course':
-                    renderStudentCourse(app);
-                    break;
-                case 'student-lesson':
-                    renderStudentLesson(app);
-                    break;
-                case 'student-test':
-                    renderStudentTest(app);
-                    break;
-                case 'student-result':
-                    renderStudentResult(app);
-                    break;
-                case 'student-reports':
-                    renderStudentReports(app);
-                    break;
-                case 'student-profile':
-                    renderStudentProfile(app);
-                    break;
-                case 'admin-dashboard':
-                    renderAdminDashboard(app);
-                    break;
-                case 'admin-students':
-                    renderAdminStudents(app);
-                    break;
-                case 'admin-student-detail':
-                    renderAdminStudentDetail(app);
-                    break;
-                case 'admin-courses':
-                    renderAdminCourses(app);
-                    break;
-                case 'admin-tests':
-                    renderAdminTests(app);
-                    break;
-                case 'admin-import':
-                    renderAdminImport(app);
-                    break;
-                case 'admin-materials':
-                    renderAdminMaterials(app);
-                    break;
-                case 'admin-reports':
-                    renderAdminReports(app);
-                    break;
-                case 'admin-settings':
-                    renderAdminSettings(app);
-                    break;
-                default:
-                    renderNotFound(app);
+                case 'loading': renderLoading(app); break;
+                case 'setup': renderSetupScreen(app); break;
+                case 'login': renderLogin(app); break;
+                case 'signup': renderSignup(app); break;
+                case 'forgot-password': renderForgotPassword(app); break;
+                case 'student-dashboard': renderStudentDashboard(app); break;
+                case 'student-course': renderStudentCourse(app); break;
+                case 'student-lesson': renderStudentLesson(app); break;
+                case 'student-test': renderStudentTest(app); break;
+                case 'student-result': renderStudentResult(app); break;
+                case 'student-reports': renderStudentReports(app); break;
+                case 'student-profile': renderStudentProfile(app); break;
+                case 'admin-dashboard': renderAdminDashboard(app); break;
+                case 'admin-students': renderAdminStudents(app); break;
+                case 'admin-student-detail': renderAdminStudentDetail(app); break;
+                case 'admin-courses': renderAdminCourses(app); break;
+                case 'admin-tests': renderAdminTests(app); break;
+                case 'admin-import': renderAdminImport(app); break;
+                case 'admin-materials': renderAdminMaterials(app); break;
+                case 'admin-settings': renderAdminSettings(app); break;
+                default: renderNotFound(app);
             }
         } catch (error) {
             console.error('Render error:', error);
@@ -884,9 +800,6 @@
         }
     }
 
-    // =====================================================
-    // TOAST NOTIFICATIONS
-    // =====================================================
     function showToast(message, type = 'info') {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
@@ -900,13 +813,10 @@
         }, 3000);
     }
 
-    // =====================================================
-    // AUTHENTICATION
-    // =====================================================
     async function checkSession() {
-        if (!supabase) return;
+        if (!db) return;
         try {
-            const { data: { session }, error } = await supabase.auth.getSession();
+            const { data: { session }, error } = await db.auth.getSession();
             if (error) throw error;
             if (session) {
                 appState.user = session.user;
@@ -926,7 +836,7 @@
     async function loadProfile() {
         if (!appState.user) return;
         try {
-            const { data: profile, error } = await supabase
+            const { data: profile, error } = await db
                 .from('profiles')
                 .select('*')
                 .eq('id', appState.user.id)
@@ -952,7 +862,7 @@
     async function loadStudentRecord() {
         if (!appState.user) return;
         try {
-            const { data: student, error } = await supabase
+            const { data: student, error } = await db
                 .from('students')
                 .select('*')
                 .eq('auth_user_id', appState.user.id)
@@ -966,7 +876,7 @@
 
     async function loadSystemSettings() {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await db
                 .from('system_settings')
                 .select('*')
                 .order('id', { ascending: true })
@@ -996,16 +906,13 @@
 
     async function handleLogin(email, password) {
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { data, error } = await db.auth.signInWithPassword({
                 email: email,
                 password: password
             });
             if (error) throw error;
             appState.user = data.user;
-            
-            // Update last login
-            await supabase.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', data.user.id);
-            
+            await db.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', data.user.id);
             await loadProfile();
             showToast('Welcome back!', 'success');
         } catch (error) {
@@ -1017,7 +924,7 @@
 
     async function handleSignup(fullName, email, password) {
         try {
-            const { data, error } = await supabase.auth.signUp({
+            const { data, error } = await db.auth.signUp({
                 email: email,
                 password: password,
                 options: {
@@ -1036,7 +943,7 @@
 
     async function handleLogout() {
         try {
-            await supabase.auth.signOut();
+            await db.auth.signOut();
             appState.user = null;
             appState.profile = null;
             appState.isAdmin = false;
@@ -1050,7 +957,7 @@
 
     async function handleForgotPassword(email) {
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            const { error } = await db.auth.resetPasswordForEmail(email, {
                 redirectTo: window.location.origin + window.location.pathname
             });
             if (error) throw error;
@@ -1064,7 +971,7 @@
 
     async function handleChangePassword(newPassword) {
         try {
-            const { error } = await supabase.auth.updateUser({ password: newPassword });
+            const { error } = await db.auth.updateUser({ password: newPassword });
             if (error) throw error;
             showToast('Password changed successfully', 'success');
         } catch (error) {
@@ -1073,20 +980,6 @@
         }
     }
 
-    async function handleChangeEmail(newEmail) {
-        try {
-            const { error } = await supabase.auth.updateUser({ email: newEmail });
-            if (error) throw error;
-            showToast('Email update requested. Check your new email for confirmation.', 'success');
-        } catch (error) {
-            console.error('Email change error:', error);
-            showToast(error.message || 'Failed to update email', 'error');
-        }
-    }
-
-    // =====================================================
-    // RENDER FUNCTIONS
-    // =====================================================
     function renderLoading(app) {
         app.innerHTML = `
             <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;">
@@ -1242,8 +1135,7 @@
         if (!student) return;
         
         try {
-            // Load enrollments
-            const { data: enrollments, error: enrollError } = await supabase
+            const { data: enrollments, error: enrollError } = await db
                 .from('enrollments')
                 .select('*, courses(*)')
                 .eq('student_id', student.id)
@@ -1251,12 +1143,9 @@
             if (enrollError) throw enrollError;
             
             appState.enrollments = enrollments || [];
-            
-            // Update stats
             document.getElementById('stat-courses').textContent = enrollments?.length || 0;
             
-            // Load all attempts
-            const { data: attempts, error: attemptsError } = await supabase
+            const { data: attempts, error: attemptsError } = await db
                 .from('test_attempts')
                 .select('*')
                 .eq('student_id', student.id)
@@ -1274,14 +1163,12 @@
             document.getElementById('stat-failed').textContent = failed;
             document.getElementById('stat-avg').textContent = avgScore + '%';
             
-            // Load published tests count
-            const { count: testCount, error: countError } = await supabase
+            const { count: testCount } = await db
                 .from('tests')
                 .select('*', { count: 'exact', head: true })
                 .eq('status', 'published');
             document.getElementById('stat-tests').textContent = testCount || 0;
             
-            // Render courses list
             renderStudentCoursesList(enrollments || []);
         } catch (error) {
             console.error('Dashboard data error:', error);
@@ -1341,7 +1228,7 @@
         if (!container) return;
         
         try {
-            const { data: lessons, error } = await supabase
+            const { data: lessons, error } = await db
                 .from('lessons')
                 .select('*')
                 .eq('course_id', courseId)
@@ -1399,24 +1286,21 @@
         if (!container) return;
         
         try {
-            // Get lesson info
-            const { data: lesson, error: lessonError } = await supabase
+            const { data: lesson, error: lessonError } = await db
                 .from('lessons')
                 .select('*, courses(title, course_code)')
                 .eq('id', lessonId)
                 .single();
             if (lessonError) throw lessonError;
             
-            // Get available tests
-            const { data: tests, error: testsError } = await supabase
+            const { data: tests, error: testsError } = await db
                 .from('tests')
                 .select('*')
                 .eq('lesson_id', lessonId)
                 .eq('status', 'published');
             if (testsError) throw testsError;
             
-            // Get lesson materials
-            const { data: materials, error: materialsError } = await supabase
+            const { data: materials, error: materialsError } = await db
                 .from('lesson_materials')
                 .select('*')
                 .eq('lesson_id', lessonId);
@@ -1460,7 +1344,7 @@
 
     async function downloadMaterial(filePath, title) {
         try {
-            const { data, error } = await supabase.storage
+            const { data, error } = await db.storage
                 .from('materials')
                 .createSignedUrl(filePath, 3600);
             if (error) throw error;
@@ -1486,16 +1370,14 @@
         if (!container) return;
         
         try {
-            // Check attempt policy
-            const { data: test, error: testError } = await supabase
+            const { data: test, error: testError } = await db
                 .from('tests')
                 .select('*')
                 .eq('id', testId)
                 .single();
             if (testError) throw testError;
             
-            // Check existing attempts
-            const { data: existingAttempts, error: attemptError } = await supabase
+            const { data: existingAttempts, error: attemptError } = await db
                 .from('test_attempts')
                 .select('*')
                 .eq('test_id', testId)
@@ -1525,8 +1407,7 @@
                 return;
             }
             
-            // Load questions (without correct_answer due to RLS/column privileges)
-            const { data: questions, error: questionsError } = await supabase
+            const { data: questions, error: questionsError } = await db
                 .from('questions')
                 .select('id, question_number, question_text, option_a, option_b, option_c, option_d, marks')
                 .eq('test_id', testId)
@@ -1543,8 +1424,7 @@
             appState.currentQuestionIndex = 0;
             appState.answers = {};
             
-            // Create attempt record
-            const { data: newAttempt, error: createError } = await supabase
+            const { data: newAttempt, error: createError } = await db
                 .from('test_attempts')
                 .insert({
                     test_id: testId,
@@ -1559,7 +1439,6 @@
             
             appState.currentAttempt = newAttempt;
             
-            // Setup timer if configured
             if (test.time_limit_minutes) {
                 appState.testTimerMax = test.time_limit_minutes * 60;
                 appState.testTimeRemaining = appState.testTimerMax;
@@ -1674,26 +1553,23 @@
 
     async function submitTest() {
         try {
-            // Save all answers
             for (const question of appState.questions) {
                 const selected = appState.answers[question.id] || null;
-                await supabase.from('attempt_answers').insert({
+                await db.from('attempt_answers').insert({
                     attempt_id: appState.currentAttempt.id,
                     question_id: question.id,
                     selected_answer: selected,
-                    is_correct: null, // Will be set by grading function
+                    is_correct: null,
                     marks_awarded: 0
                 });
             }
             
-            // Build answers JSON for RPC
             const answersJson = {};
             for (const question of appState.questions) {
                 answersJson[question.id] = appState.answers[question.id] || null;
             }
             
-            // Call grading RPC
-            const { data: result, error: gradeError } = await supabase
+            const { data: result, error: gradeError } = await db
                 .rpc('grade_test_attempt', {
                     p_test_id: appState.currentTest.id,
                     p_attempt_id: appState.currentAttempt.id,
@@ -1789,7 +1665,7 @@
         if (!container) return;
         
         try {
-            const { data: attempts, error } = await supabase
+            const { data: attempts, error } = await db
                 .from('test_attempts')
                 .select('*, tests(title, lessons(title, courses(title)))')
                 .eq('student_id', appState.studentRecord.id)
@@ -1827,7 +1703,6 @@
     }
 
     function viewStudentReport(attemptId) {
-        // Show report modal or navigate to report view
         showView('student-reports');
         showToast('Report viewing coming soon', 'info');
     }
@@ -1918,17 +1793,16 @@
 
     async function loadAdminDashboardData() {
         try {
-            // Load counts
-            const { count: studentCount } = await supabase.from('students').select('*', { count: 'exact', head: true });
-            const { count: activeStudentCount } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('status', 'active');
-            const { count: courseCount } = await supabase.from('courses').select('*', { count: 'exact', head: true }).eq('status', 'active');
-            const { count: lessonCount } = await supabase.from('lessons').select('*', { count: 'exact', head: true }).eq('status', 'active');
-            const { count: testCount } = await supabase.from('tests').select('*', { count: 'exact', head: true });
-            const { count: attemptCount } = await supabase.from('test_attempts').select('*', { count: 'exact', head: true }).in('status', ['submitted', 'verified']);
-            const { count: passedCount } = await supabase.from('test_attempts').select('*', { count: 'exact', head: true }).eq('result', 'pass');
-            const { count: failedCount } = await supabase.from('test_attempts').select('*', { count: 'exact', head: true }).eq('result', 'fail');
+            const { count: studentCount } = await db.from('students').select('*', { count: 'exact', head: true });
+            const { count: activeStudentCount } = await db.from('students').select('*', { count: 'exact', head: true }).eq('status', 'active');
+            const { count: courseCount } = await db.from('courses').select('*', { count: 'exact', head: true }).eq('status', 'active');
+            const { count: lessonCount } = await db.from('lessons').select('*', { count: 'exact', head: true }).eq('status', 'active');
+            const { count: testCount } = await db.from('tests').select('*', { count: 'exact', head: true });
+            const { count: attemptCount } = await db.from('test_attempts').select('*', { count: 'exact', head: true }).in('status', ['submitted', 'verified']);
+            const { count: passedCount } = await db.from('test_attempts').select('*', { count: 'exact', head: true }).eq('result', 'pass');
+            const { count: failedCount } = await db.from('test_attempts').select('*', { count: 'exact', head: true }).eq('result', 'fail');
             
-            const { data: attempts } = await supabase.from('test_attempts').select('percentage').in('status', ['submitted', 'verified']);
+            const { data: attempts } = await db.from('test_attempts').select('percentage').in('status', ['submitted', 'verified']);
             const avgScore = attempts?.length ? Math.round(attempts.reduce((s, a) => s + (a.percentage || 0), 0) / attempts.length) : 0;
             
             document.getElementById('admin-stat-students').textContent = studentCount || 0;
@@ -1941,7 +1815,6 @@
             document.getElementById('admin-stat-failed').textContent = failedCount || 0;
             document.getElementById('admin-stat-avg').textContent = avgScore + '%';
             
-            // Load lessons for tabs
             await loadAdminLessonTabs();
         } catch (error) {
             console.error('Admin dashboard error:', error);
@@ -1954,7 +1827,7 @@
         if (!container) return;
         
         try {
-            const { data: lessons, error } = await supabase
+            const { data: lessons, error } = await db
                 .from('lessons')
                 .select('*, courses(title)')
                 .eq('status', 'active')
@@ -1980,7 +1853,6 @@
                 </div>
             `;
             
-            // Load first lesson by default
             if (lessons.length > 0) {
                 loadLessonPerformance(lessons[0].id);
             }
@@ -2000,19 +1872,18 @@
         if (!container) return;
         
         try {
-            const { data: students, error } = await supabase
+            const { data: students, error } = await db
                 .from('students')
                 .select('*')
                 .eq('status', 'active');
             if (error) throw error;
             
-            const { data: attempts, error: attemptError } = await supabase
+            const { data: attempts, error: attemptError } = await db
                 .from('test_attempts')
                 .select('*, tests(*), students(*)')
                 .in('status', ['submitted', 'verified']);
             if (attemptError) throw attemptError;
             
-            // Filter attempts for this lesson
             const lessonAttempts = (attempts || []).filter(a => a.tests?.lesson_id === lessonId);
             
             container.innerHTML = `
@@ -2080,9 +1951,6 @@
                 <div class="card mb-2">
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.75rem;">
                         <input id="student-search-input" class="form-input" placeholder="Search name, email, ID..." oninput="filterStudents()">
-                        <select id="student-filter-course" class="form-select" onchange="filterStudents()">
-                            <option value="">All Courses</option>
-                        </select>
                         <select id="student-filter-status" class="form-select" onchange="filterStudents()">
                             <option value="">All Status</option>
                             <option value="active">Active</option>
@@ -2112,7 +1980,7 @@
             const filterStatus = document.getElementById('student-filter-status')?.value || '';
             const sortBy = document.getElementById('student-sort')?.value || 'newest';
             
-            let query = supabase.from('students').select('*');
+            let query = db.from('students').select('*');
             if (filterStatus) query = query.eq('status', filterStatus);
             query = query.order('created_at', { ascending: sortBy === 'oldest' });
             
@@ -2180,7 +2048,7 @@
     async function editStudentStatus(studentId, currentStatus) {
         const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
         try {
-            await supabase.from('students').update({ status: newStatus }).eq('id', studentId);
+            await db.from('students').update({ status: newStatus }).eq('id', studentId);
             showToast('Student status updated', 'success');
             loadAdminStudents();
         } catch (error) {
@@ -2195,7 +2063,7 @@
             <div class="modal">
                 <h2 style="font-weight:800;margin-bottom:1rem;">Add Student</h2>
                 <p style="color:#7A8A80;font-size:0.85rem;margin-bottom:1rem;">
-                    Creating a student will send an invitation email. The student can set their password via email.
+                    Creating a student will send an invitation email.
                 </p>
                 <form onsubmit="handleAddStudent(event)">
                     <div class="form-group">
@@ -2224,18 +2092,16 @@
         event.preventDefault();
         const name = document.getElementById('new-student-name').value;
         const email = document.getElementById('new-student-email').value;
-        const course = document.getElementById('new-student-course').value;
         
         try {
-            // Create auth user
-            const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+            const { error } = await db.auth.signUp({
                 email: email,
-                email_confirm: true,
-                user_metadata: { full_name: name }
+                password: 'Temporary@123',
+                options: {
+                    data: { full_name: name }
+                }
             });
-            // Note: This requires service role key. Alternative: use signUp with a temp password
-            // For simplicity, we'll use signUp approach
-            if (authError) throw authError;
+            if (error) throw error;
             
             showToast('Student added successfully!', 'success');
             document.querySelector('.modal-overlay')?.remove();
@@ -2278,14 +2144,14 @@
         if (!container) return;
         
         try {
-            const { data: student, error } = await supabase
+            const { data: student, error } = await db
                 .from('students')
                 .select('*')
                 .eq('id', studentId)
                 .single();
             if (error) throw error;
             
-            const { data: attempts, error: attemptsError } = await supabase
+            const { data: attempts, error: attemptsError } = await db
                 .from('test_attempts')
                 .select('*, tests(title, lessons(title))')
                 .eq('student_id', studentId)
@@ -2338,7 +2204,6 @@
     }
 
     function viewStudentAttemptDetail(attemptId) {
-        // Show modal with attempt details
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
         modal.innerHTML = `
@@ -2352,24 +2217,22 @@
         `;
         document.body.appendChild(modal);
         
-        // Load attempt details
         (async () => {
             try {
-                const { data: attempt, error: aError } = await supabase
+                const { data: attempt, error: aError } = await db
                     .from('test_attempts')
                     .select('*')
                     .eq('id', attemptId)
                     .single();
                 if (aError) throw aError;
                 
-                const { data: answers, error: ansError } = await supabase
+                const { data: answers, error: ansError } = await db
                     .from('attempt_answers')
                     .select('*, questions(question_text, option_a, option_b, option_c, option_d)')
                     .eq('attempt_id', attemptId);
                 if (ansError) throw ansError;
                 
-                // Admin can see correct answers
-                const { data: questions } = await supabase
+                const { data: questions } = await db
                     .from('questions')
                     .select('id, correct_answer')
                     .eq('test_id', attempt.test_id);
@@ -2432,7 +2295,7 @@
         if (!container) return;
         
         try {
-            const { data: courses, error } = await supabase
+            const { data: courses, error } = await db
                 .from('courses')
                 .select('*, lessons(*)')
                 .order('created_at');
@@ -2501,7 +2364,7 @@
     async function handleAddCourse(event) {
         event.preventDefault();
         try {
-            await supabase.from('courses').insert({
+            await db.from('courses').insert({
                 course_code: document.getElementById('new-course-code').value,
                 title: document.getElementById('new-course-title').value,
                 description: document.getElementById('new-course-desc').value
@@ -2548,7 +2411,7 @@
         try {
             const lessonNumber = parseInt(document.getElementById('new-lesson-number').value);
             const lessonCode = `LESSON-${String(lessonNumber).padStart(3, '0')}`;
-            await supabase.from('lessons').insert({
+            await db.from('lessons').insert({
                 course_id: courseId,
                 lesson_code: lessonCode,
                 lesson_number: lessonNumber,
@@ -2566,7 +2429,7 @@
     async function toggleCourseStatus(courseId, currentStatus) {
         const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
         try {
-            await supabase.from('courses').update({ status: newStatus }).eq('id', courseId);
+            await db.from('courses').update({ status: newStatus }).eq('id', courseId);
             showToast('Course status updated', 'success');
             loadAdminCourses();
         } catch (error) {
@@ -2608,7 +2471,7 @@
         if (!container) return;
         
         try {
-            const { data: tests, error } = await supabase
+            const { data: tests, error } = await db
                 .from('tests')
                 .select('*, lessons(title, courses(title)), questions(count)')
                 .order('created_at', { ascending: false });
@@ -2640,7 +2503,7 @@
     async function toggleTestStatus(testId, currentStatus) {
         const newStatus = currentStatus === 'published' ? 'draft' : 'published';
         try {
-            await supabase.from('tests').update({ status: newStatus }).eq('id', testId);
+            await db.from('tests').update({ status: newStatus }).eq('id', testId);
             showToast('Test status updated', 'success');
             loadAdminTests();
         } catch (error) {
@@ -2764,7 +2627,6 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
                 parsed = parseJSON(content);
             }
             
-            // Show preview
             const questions = parsed.questions || [];
             const totalMarks = questions.reduce((sum, q) => sum + (q.marks || 0), 0);
             const passingPct = parsed.test?.passing_percentage || 50;
@@ -2902,9 +2764,8 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
         }
         
         try {
-            // Find or create course
             let courseId;
-            const { data: existingCourse } = await supabase
+            const { data: existingCourse } = await db
                 .from('courses')
                 .select('id')
                 .eq('course_code', parsed.test.course_id)
@@ -2913,7 +2774,7 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
             if (existingCourse) {
                 courseId = existingCourse.id;
             } else {
-                const { data: newCourse, error: courseError } = await supabase
+                const { data: newCourse, error: courseError } = await db
                     .from('courses')
                     .insert({
                         course_code: parsed.test.course_id,
@@ -2926,9 +2787,8 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
                 courseId = newCourse.id;
             }
             
-            // Find or create lesson
             let lessonId;
-            const { data: existingLesson } = await supabase
+            const { data: existingLesson } = await db
                 .from('lessons')
                 .select('id')
                 .eq('lesson_code', parsed.test.lesson_id)
@@ -2937,7 +2797,7 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
             if (existingLesson) {
                 lessonId = existingLesson.id;
             } else {
-                const { data: newLesson, error: lessonError } = await supabase
+                const { data: newLesson, error: lessonError } = await db
                     .from('lessons')
                     .insert({
                         course_id: courseId,
@@ -2951,8 +2811,7 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
                 lessonId = newLesson.id;
             }
             
-            // Create test
-            const { data: newTest, error: testError } = await supabase
+            const { data: newTest, error: testError } = await db
                 .from('tests')
                 .insert({
                     test_code: parsed.test.test_id,
@@ -2968,9 +2827,8 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
                 .single();
             if (testError) throw testError;
             
-            // Insert questions
             for (const q of parsed.questions) {
-                const { error: qError } = await supabase.from('questions').insert({
+                const { error: qError } = await db.from('questions').insert({
                     test_id: newTest.id,
                     question_number: q.question_number,
                     question_text: q.question,
@@ -2984,8 +2842,7 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
                 if (qError) throw qError;
             }
             
-            // Record import history
-            await supabase.from('import_history').insert({
+            await db.from('import_history').insert({
                 file_name: fileName,
                 test_code: parsed.test.test_id,
                 questions_count: parsed.questions.length,
@@ -2993,7 +2850,6 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
                 imported_by: appState.user?.id
             });
             
-            // Clear preview
             document.getElementById('import-preview').innerHTML = '';
             document.getElementById('import-file-input').value = '';
             appState.importPreview = null;
@@ -3050,18 +2906,16 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
     }
 
     async function loadMaterialsData() {
-        // Populate lesson select
         const lessonSelect = document.getElementById('material-lesson');
         if (lessonSelect) {
-            const { data: lessons } = await supabase.from('lessons').select('*').eq('status', 'active').order('lesson_number');
+            const { data: lessons } = await db.from('lessons').select('*').eq('status', 'active').order('lesson_number');
             lessonSelect.innerHTML = lessons?.map(l => `<option value="${l.id}">${l.title}</option>`).join('') || '<option value="">No lessons</option>';
         }
         
-        // Load materials list
         const container = document.getElementById('materials-list');
         if (!container) return;
         
-        const { data: materials, error } = await supabase
+        const { data: materials, error } = await db
             .from('lesson_materials')
             .select('*, lessons(title)');
         if (error) {
@@ -3091,12 +2945,12 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
         
         try {
             const filePath = `lesson_${lessonId}_${Date.now()}_${file.name}`;
-            const { error: uploadError } = await supabase.storage
+            const { error: uploadError } = await db.storage
                 .from('materials')
                 .upload(filePath, file);
             if (uploadError) throw uploadError;
             
-            await supabase.from('lesson_materials').insert({
+            await db.from('lesson_materials').insert({
                 lesson_id: lessonId,
                 title: title,
                 file_path: filePath,
@@ -3118,7 +2972,7 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
     async function deleteMaterial(materialId) {
         if (!confirm('Delete this material?')) return;
         try {
-            await supabase.from('lesson_materials').delete().eq('id', materialId);
+            await db.from('lesson_materials').delete().eq('id', materialId);
             showToast('Material deleted', 'success');
             loadMaterialsData();
         } catch (error) {
@@ -3224,7 +3078,7 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
                 self_registration_enabled: document.getElementById('setting-self-reg').value === 'true'
             };
             
-            const { error } = await supabase.from('system_settings')
+            const { error } = await db.from('system_settings')
                 .update(settings)
                 .eq('id', 1);
             if (error) throw error;
@@ -3259,9 +3113,6 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
         `;
     }
 
-    // =====================================================
-    // TEST TIMER
-    // =====================================================
     function startTestTimer() {
         stopTestTimer();
         appState.testTimerInterval = setInterval(() => {
@@ -3272,7 +3123,6 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
                 submitTest();
                 return;
             }
-            // Update timer display
             const timerElement = document.querySelector('.test-timer span');
             if (timerElement) {
                 const mins = Math.floor(appState.testTimeRemaining / 60);
@@ -3292,9 +3142,6 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
         }
     }
 
-    // =====================================================
-    // EVENT HANDLERS (Form submissions)
-    // =====================================================
     window.handleLoginForm = async function(event) {
         event.preventDefault();
         const email = document.getElementById('login-email')?.value;
@@ -3322,9 +3169,6 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
         }
     };
 
-    // =====================================================
-    // STUDENT NAVIGATION FUNCTIONS
-    // =====================================================
     window.openStudentCourse = function(courseId) {
         showView('student-course', { courseId });
     };
@@ -3338,8 +3182,7 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
     };
 
     window.viewStudentReport = function(attemptId) {
-        // Show report in modal
-        // For now, just show a toast
+        showView('student-reports');
         showToast('Report viewing coming soon', 'info');
     };
 
@@ -3379,9 +3222,6 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
     window.showView = showView;
     window.handleLogout = handleLogout;
 
-    // =====================================================
-    // APPLICATION STARTUP
-    // =====================================================
     async function initializeApp() {
         renderLoading(document.getElementById('app'));
         
@@ -3392,10 +3232,8 @@ TEST-001,COURSE-001,LESSON-001,E-Commerce Product Hunting,Lesson 1: Product Rese
         await checkSession();
     }
 
-    // Start the application
     document.addEventListener('DOMContentLoaded', initializeApp);
 
-    // Also handle if DOM already loaded
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
         initializeApp();
     }
